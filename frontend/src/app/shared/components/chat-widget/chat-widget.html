@@ -1,0 +1,88 @@
+<!-- Floating Action Button -->
+<div class="chat-fab-wrapper">
+  @if (!isOpen()) {
+    <button (click)="toggleChat()" class="chat-fab" title="Abrir chat comunitario en tiempo real">
+      <span class="chat-fab-icon">💬</span>
+      <span class="chat-fab-text">Chat Vecinal</span>
+      @if (unreadCount() > 0) {
+        <span class="unread-badge">{{ unreadCount() }}</span>
+      }
+    </button>
+  }
+</div>
+
+<!-- Floating Chatbox Window -->
+@if (isOpen()) {
+  <div class="chatbox-modal">
+    <!-- Header -->
+    <div class="chatbox-header">
+      <div class="header-left">
+        <span class="header-icon">💬</span>
+        <div class="header-info">
+          <h4>Chat Comunitario</h4>
+          <span class="channel-status">
+            <span class="status-dot" [class.status-online]="isConnected()"></span>
+            {{ isConnected() ? 'WebSocket en vivo' : 'Conectando...' }}
+          </span>
+        </div>
+      </div>
+      <button (click)="toggleChat()" class="btn-close-chat" title="Cerrar chat">✕</button>
+    </div>
+
+    <!-- Subtitle channel info -->
+    <div class="channel-banner">
+      <span>📣 Canal: <strong>#general</strong> — Coordina préstamos y entregas</span>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="chatbox-messages" #messagesScroll>
+      @if (messages().length === 0) {
+        <div class="chat-empty">
+          <p>Aún no hay mensajes. ¡Sé el primero en saludar a la comunidad!</p>
+        </div>
+      }
+
+      @for (msg of messages(); track msg._id || $index) {
+        <div class="message-row" [class.my-message-row]="isMyMessage(msg)">
+          <div class="message-bubble" [class.my-bubble]="isMyMessage(msg)">
+            <div class="message-author">
+              <span class="author-name">{{ msg.nombreUsuario }}</span>
+              @if (msg.rolUsuario === 'admin') {
+                <span class="admin-chip">Admin</span>
+              }
+              <span class="message-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+            </div>
+            <p class="message-text">{{ msg.mensaje }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Footer / Input Form -->
+    <div class="chatbox-footer">
+      @if (authService.isAuthenticated()) {
+        <form (ngSubmit)="onSendMessage()" class="chat-form">
+          <input
+            type="text"
+            [(ngModel)]="newMessage"
+            name="chatInput"
+            placeholder="Escribe un mensaje a la comunidad..."
+            maxlength="500"
+            autocomplete="off"
+            required
+          />
+          <button type="submit" class="btn-send" [disabled]="!newMessage.trim()">
+            <span>➤</span>
+          </button>
+        </form>
+      } @else {
+        <div class="chat-login-prompt">
+          <p>Inicia sesión para chatear en tiempo real</p>
+          <a routerLink="/login" (click)="toggleChat()" class="btn btn-sm btn-primary">
+            Ingresar
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+}

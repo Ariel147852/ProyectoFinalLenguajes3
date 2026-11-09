@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { User } from '../models/User';
 import { Tool } from '../models/Tool';
 import { Loan } from '../models/Loan';
+import { ChatMessage } from '../models/ChatMessage';
 import { ENV } from '../config/env';
 
 // Puntos geográficos distribuidos en diferentes barrios de la comunidad
@@ -25,9 +26,10 @@ export const seedDatabase = async () => {
     await Promise.all([
       User.deleteMany({}),
       Tool.deleteMany({}),
-      Loan.deleteMany({})
+      Loan.deleteMany({}),
+      ChatMessage.deleteMany({})
     ]);
-    console.log('[Seeder] Colecciones users, tools y loans limpiadas.');
+    console.log('[Seeder] Colecciones users, tools, loans y chatmessages limpiadas.');
 
     // 2. Cifrado de contraseñas de prueba
     const salt = await bcrypt.genSalt(10);
@@ -323,6 +325,36 @@ export const seedDatabase = async () => {
     });
 
     console.log('[Seeder] 3 Préstamos de prueba generados en estados: aprobado, pendiente y devuelto.');
+
+    // 6. Mensajes iniciales en el Chat Comunitario en tiempo real
+    await ChatMessage.insertMany([
+      {
+        usuarioId: admin._id,
+        nombreUsuario: 'Administrador General',
+        rolUsuario: 'admin',
+        mensaje: '¡Bienvenidos al chat comunitario de Tool Library! Aquí pueden coordinar entregas y consultar disponibilidad.',
+        sala: 'comunidad_general',
+        createdAt: new Date(hoy.getTime() - 2 * 60 * 60 * 1000)
+      },
+      {
+        usuarioId: carlos._id,
+        nombreUsuario: 'Carlos Mendoza',
+        rolUsuario: 'user',
+        mensaje: 'Hola vecinos, acabo de publicar la sierra circular y el taladro con juego de brocas. Disponibles para retiro en La Floresta.',
+        sala: 'comunidad_general',
+        createdAt: new Date(hoy.getTime() - 1 * 60 * 60 * 1000)
+      },
+      {
+        usuarioId: lucia._id,
+        nombreUsuario: 'Lucía Benítez',
+        rolUsuario: 'user',
+        mensaje: 'Gracias Carlos! Ya te envié la solicitud por el taladro para armar mis repisas este fin de semana.',
+        sala: 'comunidad_general',
+        createdAt: new Date(hoy.getTime() - 30 * 60 * 1000)
+      }
+    ]);
+    console.log('[Seeder] Mensajes iniciales de WebSocket insertados.');
+
     console.log('[Seeder] ¡Semillero completado con éxito!');
     process.exit(0);
   } catch (error) {
