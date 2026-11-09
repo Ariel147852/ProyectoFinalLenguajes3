@@ -5,6 +5,25 @@
       <p>Accede para solicitar préstamos y prestar herramientas</p>
     </div>
 
+    <!-- Tarjetas de Acceso Rápido para Pruebas -->
+    <div class="demo-box">
+      <div class="demo-box-header">
+        <span class="demo-icon">⚡</span>
+        <span>Acceso Rápido de Prueba (1 Clic)</span>
+      </div>
+      <div class="demo-btn-grid">
+        <button type="button" (click)="quickLogin('admin')" class="btn-demo btn-demo-admin" title="Entrar como Administrador General">
+          👑 Admin
+        </button>
+        <button type="button" (click)="quickLogin('carlos')" class="btn-demo btn-demo-carlos" title="Entrar como Carlos Mendoza (Dueño)">
+          🛠️ Carlos
+        </button>
+        <button type="button" (click)="quickLogin('lucia')" class="btn-demo btn-demo-lucia" title="Entrar como Lucía Benítez (Prestataria)">
+          🙋‍♀️ Lucía
+        </button>
+      </div>
+    </div>
+
     @if (errorMessage) {
       <div class="alert alert-error">
         {{ errorMessage }}

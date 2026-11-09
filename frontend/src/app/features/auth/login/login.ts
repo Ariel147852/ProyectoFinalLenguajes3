@@ -26,6 +26,20 @@ export class LoginComponent {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
+  quickLogin(role: 'admin' | 'carlos' | 'lucia'): void {
+    if (role === 'admin') {
+      this.email = 'admin@toollibrary.org';
+      this.password = 'AdminPassword123!';
+    } else if (role === 'carlos') {
+      this.email = 'carlos@vecino.org';
+      this.password = 'UserPassword123!';
+    } else if (role === 'lucia') {
+      this.email = 'lucia@vecina.org';
+      this.password = 'UserPassword123!';
+    }
+    this.onSubmit();
+  }
+
   onSubmit(): void {
     if (!this.email || !this.password) {
       this.errorMessage = 'Por favor complete todos los campos';
