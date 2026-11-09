@@ -120,42 +120,7 @@ export const seedDatabase = async () => {
       }
     });
 
-    const marcos = await User.create({
-      nombre: 'Marcos Andrade',
-      email: 'marcos@vecino.org',
-      passwordHash: userPass,
-      rol: 'user',
-      cedula: '1710034065',
-      cedulaFrontalUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
-      cedulaPosteriorUrl: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
-      cedulaVerificada: true,
-      telefono: '0963334455',
-      direccionZona: ubicacionesBarrios[3].zona,
-      reputacionPromedio: 4.8,
-      estadoSuscripcion: 'inactiva',
-      limiteHerramientasBase: 5,
-      herramientasExtras: 0,
-      datosFinancieros: {
-        banco: 'Produbanco',
-        tipoCuenta: 'Cuenta de Ahorros',
-        numeroCuenta: '1205938472',
-        titular: 'Marcos Andrade',
-        telefonoDeUna: '0963334455',
-        qrDeUnaUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DEUNA_PAGO_MARCOS_ANDRADE'
-      }
-    });
-
-    const elena = await User.create({
-      nombre: 'Elena Ramos',
-      email: 'elena@vecina.org',
-      passwordHash: userPass,
-      rol: 'user',
-      telefono: '0952221100',
-      direccionZona: ubicacionesBarrios[4].zona,
-      reputacionPromedio: 4.95
-    });
-
-    console.log('[Seeder] 5 Usuarios creados con credenciales seguras.');
+    console.log('[Seeder] 3 Usuarios creados con credenciales seguras (Admin, Carlos y Lucía).');
 
     // 4. Catálogo Enriquecido de 16 Herramientas Comunitarias
     const toolsData = [
@@ -183,25 +148,25 @@ export const seedDatabase = async () => {
         maxDiasPrestamo: 3
       },
       {
-        propietarioId: marcos._id,
+        propietarioId: carlos._id,
         nombre: 'Amoladora Angular Makita 4-1/2" 840W',
         descripcion: 'Esmeriladora potente para corte de metales, desbaste de soldadura y corte de baldosas cerámicas. Incluye guarda de seguridad y llave.',
         categoria: 'electricas',
         estadoFisico: 'excelente',
         imagenes: ['https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[3].lng, ubicacionesBarrios[3].lat] },
-        direccionZona: ubicacionesBarrios[3].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[0].lng, ubicacionesBarrios[0].lat] },
+        direccionZona: ubicacionesBarrios[0].zona,
         maxDiasPrestamo: 4
       },
       {
-        propietarioId: elena._id,
+        propietarioId: carlos._id,
         nombre: 'Lijadora Orbital Stanley 240W con recolector',
         descripcion: 'Lijadora de acabado fino para restauración de muebles de madera y puertas. Con bolsa recolectora de polvo y pinzas de sujeción rápida.',
         categoria: 'electricas',
         estadoFisico: 'bueno',
         imagenes: ['https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[4].lng, ubicacionesBarrios[4].lat] },
-        direccionZona: ubicacionesBarrios[4].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[0].lng, ubicacionesBarrios[0].lat] },
+        direccionZona: ubicacionesBarrios[0].zona,
         maxDiasPrestamo: 4
       },
 
@@ -218,14 +183,14 @@ export const seedDatabase = async () => {
         maxDiasPrestamo: 2
       },
       {
-        propietarioId: marcos._id,
+        propietarioId: carlos._id,
         nombre: 'Hidrolavadora Kärcher K3 1600 PSI',
         descripcion: 'Máquina de agua a alta presión perfecta para lavar patios, adoquines, fachadas, terrazas y vehículos. Incluye manguera de 6m y lanza rotativa.',
         categoria: 'jardineria',
         estadoFisico: 'excelente',
         imagenes: ['https://images.unsplash.com/photo-1584473457406-6240486418e9?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[3].lng, ubicacionesBarrios[3].lat] },
-        direccionZona: ubicacionesBarrios[3].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[0].lng, ubicacionesBarrios[0].lat] },
+        direccionZona: ubicacionesBarrios[0].zona,
         maxDiasPrestamo: 3
       },
       {
@@ -253,49 +218,49 @@ export const seedDatabase = async () => {
         maxDiasPrestamo: 7
       },
       {
-        propietarioId: elena._id,
+        propietarioId: lucia._id,
         nombre: 'Juego de Llaves de Tubo y Carraca de 1/2" y 1/4"',
         descripcion: 'Juego de dados milimétricos en cromo vanadio de alta resistencia para mecánica doméstica, bicicletas y armado de estructuras.',
         categoria: 'manuales',
         estadoFisico: 'bueno',
         imagenes: ['https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[4].lng, ubicacionesBarrios[4].lat] },
-        direccionZona: ubicacionesBarrios[4].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[1].lng, ubicacionesBarrios[1].lat] },
+        direccionZona: ubicacionesBarrios[1].zona,
         maxDiasPrestamo: 5
       },
 
       // --- Construcción & Remodelación ---
       {
-        propietarioId: lucia._id,
+        propietarioId: carlos._id,
         nombre: 'Escalera Telescópica de Aluminio 3.8m Plegable',
         descripcion: 'Escalera articulada extensible de aluminio reforzado. Soporta hasta 150 kg de carga y se compacta a solo 90 cm para fácil transporte en coche.',
         categoria: 'construccion',
         estadoFisico: 'bueno',
         imagenes: ['https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[1].lng, ubicacionesBarrios[1].lat] },
-        direccionZona: ubicacionesBarrios[1].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[0].lng, ubicacionesBarrios[0].lat] },
+        direccionZona: ubicacionesBarrios[0].zona,
         maxDiasPrestamo: 6
       },
       {
-        propietarioId: marcos._id,
+        propietarioId: carlos._id,
         nombre: 'Nivel Láser Autonivelante 360° con Trípode',
         descripcion: 'Emite líneas verdes horizontales y verticales de alta visibilidad para alineación precisa de baldosas, cuadros, estantes y falsos techos.',
         categoria: 'construccion',
         estadoFisico: 'excelente',
         imagenes: ['https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[5].lng, ubicacionesBarrios[5].lat] },
-        direccionZona: ubicacionesBarrios[5].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[0].lng, ubicacionesBarrios[0].lat] },
+        direccionZona: ubicacionesBarrios[0].zona,
         maxDiasPrestamo: 4
       },
       {
-        propietarioId: elena._id,
+        propietarioId: lucia._id,
         nombre: 'Carretilla Reforzada para Obra y Tierra 90 Litros',
         descripcion: 'Tolva de acero embutido de alta durabilidad con rueda neumática. Ideal para mover escombros, tierra de jardín o sacos de cemento.',
         categoria: 'construccion',
         estadoFisico: 'regular',
         imagenes: ['https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[4].lng, ubicacionesBarrios[4].lat] },
-        direccionZona: ubicacionesBarrios[4].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[1].lng, ubicacionesBarrios[1].lat] },
+        direccionZona: ubicacionesBarrios[1].zona,
         maxDiasPrestamo: 3
       },
 
@@ -325,25 +290,25 @@ export const seedDatabase = async () => {
 
       // --- Fontanería ---
       {
-        propietarioId: marcos._id,
+        propietarioId: carlos._id,
         nombre: 'Desatascador de Tuberías Espiral 10m y Llave Stillson 14"',
         descripcion: 'Herramientas esenciales para mantenimiento de desagües en cocinas y baños. Cable de acero flexible de 10m con manivela giratoria.',
         categoria: 'fontaneria',
         estadoFisico: 'bueno',
         imagenes: ['https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[3].lng, ubicacionesBarrios[3].lat] },
-        direccionZona: ubicacionesBarrios[3].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[0].lng, ubicacionesBarrios[0].lat] },
+        direccionZona: ubicacionesBarrios[0].zona,
         maxDiasPrestamo: 2
       },
       {
-        propietarioId: elena._id,
+        propietarioId: carlos._id,
         nombre: 'Termofusora para Tuberías de Termofusión PPR 800W',
         descripcion: 'Máquina para soldar tuberías de agua fría y caliente PPR. Incluye boquillas de 20, 25 y 32 mm, soporte y tijera cortatubos.',
         categoria: 'fontaneria',
         estadoFisico: 'excelente',
         imagenes: ['https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80'],
-        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[6].lng, ubicacionesBarrios[6].lat] },
-        direccionZona: ubicacionesBarrios[6].zona,
+        ubicacion: { type: 'Point', coordinates: [ubicacionesBarrios[0].lng, ubicacionesBarrios[0].lat] },
+        direccionZona: ubicacionesBarrios[0].zona,
         maxDiasPrestamo: 3
       }
     ];
@@ -368,23 +333,23 @@ export const seedDatabase = async () => {
       notasPropietario: 'Con mucho gusto, incluye brocas para concreto.'
     });
 
-    // Préstamo 2: Pendiente de Pago con Reloj de 15 minutos (Carlos le pide la Hidrolavadora a Marcos)
+    // Préstamo 2: Pendiente de Pago con Reloj de 15 minutos (Lucía le pide la Sierra a Carlos)
     await Loan.create({
-      herramientaId: createdTools[5]._id,
-      solicitanteId: carlos._id,
-      propietarioId: marcos._id,
+      herramientaId: createdTools[1]._id,
+      solicitanteId: lucia._id,
+      propietarioId: carlos._id,
       fechaInicio: new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000),
       fechaFin: new Date(hoy.getTime() + 9 * 24 * 60 * 60 * 1000),
       estado: 'pendiente',
       estadoPago: 'pendiente_pago',
       fechaLimitePago: new Date(Date.now() + 14 * 60 * 1000), // Reloj de 14 minutos activos
-      notasSolicitante: 'Para lavar el patio posterior durante el fin de semana.'
+      notasSolicitante: 'Para cortar unos tableros de madera durante el fin de semana.'
     });
 
-    // Préstamo 3: Comprobante DeUna subido, pendiente de validación por el prestador (Marcos le pide el Rotomartillo a Carlos)
+    // Préstamo 3: Comprobante DeUna subido, pendiente de validación por el prestador (Lucía le pide la Hidrolavadora a Carlos)
     await Loan.create({
-      herramientaId: createdTools[1]._id,
-      solicitanteId: marcos._id,
+      herramientaId: createdTools[3]._id,
+      solicitanteId: lucia._id,
       propietarioId: carlos._id,
       fechaInicio: new Date(hoy.getTime() + 3 * 24 * 60 * 60 * 1000),
       fechaFin: new Date(hoy.getTime() + 6 * 24 * 60 * 60 * 1000),
@@ -397,21 +362,21 @@ export const seedDatabase = async () => {
       notasSolicitante: 'Pago realizado vía Código QR DeUna por garantía de retiro.'
     });
 
-    // Préstamo 4: Devuelto / Finalizado (Elena devolvió la Escalera a Lucía)
+    // Préstamo 4: Devuelto / Finalizado (Lucía devolvió el Maletín a Carlos)
     await Loan.create({
-      herramientaId: createdTools[9]._id,
-      solicitanteId: elena._id,
-      propietarioId: lucia._id,
+      herramientaId: createdTools[5]._id,
+      solicitanteId: lucia._id,
+      propietarioId: carlos._id,
       fechaInicio: new Date(hoy.getTime() - 10 * 24 * 60 * 60 * 1000),
       fechaFin: new Date(hoy.getTime() - 7 * 24 * 60 * 60 * 1000),
       fechaEntregaReal: new Date(hoy.getTime() - 10 * 24 * 60 * 60 * 1000),
       fechaDevolucionReal: new Date(hoy.getTime() - 7 * 24 * 60 * 60 * 1000),
       estado: 'devuelto',
-      notasSolicitante: 'Para podar una buganvilla alta.',
-      notasPropietario: 'Excelente cuidado del equipo.'
+      notasSolicitante: 'Para reparaciones menores en casa.',
+      notasPropietario: 'Excelente cuidado del equipo, devuelto a tiempo.'
     });
 
-    console.log('[Seeder] 3 Préstamos de prueba generados en estados: aprobado, pendiente y devuelto.');
+    console.log('[Seeder] 4 Préstamos de prueba generados entre Carlos y Lucía (aprobado, reloj 15 min, comprobante subido y devuelto).');
 
     // 6. Mensajes iniciales en el Chat Comunitario en tiempo real
     await ChatMessage.insertMany([
@@ -450,8 +415,8 @@ export const seedDatabase = async () => {
         createdAt: new Date(hoy.getTime() - 15 * 60 * 1000)
       },
       {
-        usuarioId: marcos._id,
-        nombreUsuario: 'Marcos Andrade',
+        usuarioId: lucia._id,
+        nombreUsuario: 'Lucía Benítez',
         rolUsuario: 'user',
         tipoContenido: 'video',
         mediaUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
@@ -495,16 +460,16 @@ export const seedDatabase = async () => {
         createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
       },
       {
-        usuarioId: marcos._id,
+        usuarioId: lucia._id,
         tipoPago: 'suscripcion_mensual',
         monto: 5.0,
         cantidadHerramientasExtras: 0,
         metodoPago: 'transferencia_bancaria',
-        bancoOrigen: 'Produbanco',
-        numeroComprobante: 'PROD-7719234',
+        bancoOrigen: 'Banco Guayaquil',
+        numeroComprobante: 'GUAY-7719234',
         comprobanteUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
         estado: 'pendiente',
-        notas: 'Transferencia realizada desde app móvil Produbanco por $5.00 para suscripción de este mes.',
+        notas: 'Transferencia realizada desde app móvil Banco Guayaquil por $5.00 para suscripción de este mes.',
         createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000)
       }
     ]);
