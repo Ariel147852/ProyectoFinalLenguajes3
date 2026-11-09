@@ -131,3 +131,4 @@ export class FinancialDataComponent implements OnInit {
     });
   }
 }
+

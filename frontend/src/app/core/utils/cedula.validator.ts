@@ -44,3 +44,4 @@ export const validarCedulaEcuatoriana = (cedula: string): { valida: boolean; men
 
   return { valida: true };
 };
+
