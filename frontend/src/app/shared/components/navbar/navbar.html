@@ -1,0 +1,49 @@
+<header class="navbar-container">
+  <div class="nav-content">
+    <a routerLink="/" class="brand">
+      <div class="brand-logo">
+        <span class="brand-icon">⚡</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">Tool<strong>Library</strong></span>
+        <span class="brand-sub">Comunidad Circular</span>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+      <a routerLink="/catalog" routerLinkActive="active">Catálogo</a>
+      <a routerLink="/map" routerLinkActive="active">Mapa Cercano</a>
+
+      @if (authService.isAuthenticated()) {
+        <a routerLink="/loans" routerLinkActive="active">Mis Préstamos</a>
+        
+        @if (authService.isAdmin()) {
+          <a routerLink="/admin" routerLinkActive="active" class="admin-link">🛡️ Panel Admin</a>
+        }
+
+        <a routerLink="/tools/new" class="btn btn-primary btn-sm btn-action">+ Prestar Herramienta</a>
+      }
+    </nav>
+
+    <div class="nav-auth">
+      @if (authService.isAuthenticated()) {
+        <div class="user-chip">
+          <span class="user-avatar">{{ authService.isAdmin() ? '👑' : '👤' }}</span>
+          <div class="user-details">
+            <span class="user-name">{{ authService.currentUser()?.nombre }}</span>
+            @if (authService.isAdmin()) {
+              <span class="user-role-badge">Admin</span>
+            }
+          </div>
+          <button (click)="onLogout()" class="btn-logout" title="Cerrar sesión">Salir</button>
+        </div>
+      } @else {
+        <div class="auth-buttons">
+          <a routerLink="/login" class="btn btn-sm btn-link">Iniciar Sesión</a>
+          <a routerLink="/register" class="btn btn-sm btn-primary">Registrarse</a>
+        </div>
+      }
+    </div>
+  </div>
+</header>

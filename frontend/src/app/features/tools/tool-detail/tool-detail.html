@@ -1,0 +1,161 @@
+<div class="detail-container">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando detalles de la herramienta...</p>
+    </div>
+  } @else if (!tool()) {
+    <div class="empty-state">
+      <h2>Herramienta no encontrada</h2>
+      <a routerLink="/catalog" class="btn btn-primary">Volver al catálogo</a>
+    </div>
+  } @else {
+    <div class="detail-layout">
+      <!-- Left Column: Tool Presentation -->
+      <div class="tool-presentation">
+        <div class="image-box">
+          <img
+            [src]="tool()!.imagenes[0] || 'https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&w=800&q=80'"
+            [alt]="tool()!.nombre"
+          />
+        </div>
+
+        <div class="tool-info-card">
+          <div class="badge-row">
+            <span class="category-badge">{{ tool()!.categoria | uppercase }}</span>
+            <span class="condition-badge" [class]="tool()!.estadoFisico">
+              Estado: {{ tool()!.estadoFisico | titlecase }}
+            </span>
+          </div>
+
+          <h1 class="tool-title">{{ tool()!.nombre }}</h1>
+          <p class="tool-desc">{{ tool()!.descripcion }}</p>
+
+          <div class="specs-grid">
+            <div class="spec-item">
+              <span class="spec-label">📍 Zona / Barrio de Retiro</span>
+              <span class="spec-val">{{ tool()!.direccionZona }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">⏱️ Préstamo Máximo</span>
+              <span class="spec-val">{{ tool()!.maxDiasPrestamo }} días continuos</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">👤 Vecino Propietario</span>
+              <span class="spec-val">{{ $any(tool()!.propietarioId).nombre }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">⭐ Reputación Comunitaria</span>
+              <span class="spec-val">{{ $any(tool()!.propietarioId).reputacionPromedio || '5.0' }} / 5.0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blocked Ranges Info Box -->
+        <div class="availability-card">
+          <div class="availability-header">
+            <h3>📅 Calendario de Disponibilidad</h3>
+            <span class="rule-badge">Regla RN01 Anti-Solapamiento</span>
+          </div>
+          @if (blockedRanges().length === 0) {
+            <div class="available-alert">
+              <span class="check-icon">✅</span>
+              <div>
+                <strong>Totalmente disponible</strong>
+                <p>No tiene reservas confirmadas en curso para los próximos días.</p>
+              </div>
+            </div>
+          } @else {
+            <p class="note">Las siguientes fechas ya se encuentran comprometidas y bloqueadas:</p>
+            <ul class="blocked-list">
+              @for (range of blockedRanges(); track range.inicio) {
+                <li>
+                  🔒 Desde el <strong>{{ range.inicio | date:'dd/MM/yyyy' }}</strong> hasta el <strong>{{ range.fin | date:'dd/MM/yyyy' }}</strong>
+                  <span class="status-tag">({{ range.estado }})</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+
+      <!-- Right Column: Reservation Request Card -->
+      <div class="reservation-column">
+        <div class="reservation-card">
+          <h2>Solicitar Préstamo</h2>
+          <p class="card-subtitle">Selecciona el rango de fechas para reservar este equipo</p>
+
+          @if (feedbackMessage()) {
+            <div class="alert" [class.alert-success]="feedbackType() === 'success'" [class.alert-error]="feedbackType() === 'error'">
+              {{ feedbackMessage() }}
+            </div>
+          }
+
+          <form (ngSubmit)="onSubmitReservation()" class="reservation-form">
+            <div class="form-group">
+              <label for="fechaInicio">Fecha de Inicio de Retiro *</label>
+              <input
+                type="date"
+                id="fechaInicio"
+                name="fechaInicio"
+                [(ngModel)]="fechaInicio"
+                (ngModelChange)="onDatesChanged()"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="fechaFin">Fecha de Devolución Pactada *</label>
+              <input
+                type="date"
+                id="fechaFin"
+                name="fechaFin"
+                [(ngModel)]="fechaFin"
+                (ngModelChange)="onDatesChanged()"
+                required
+              />
+            </div>
+
+            <!-- Calculador Dinámico de Duración -->
+            @if (calculatedDays()) {
+              <div class="duration-pill" [class.duration-pill-warn]="durationWarning()">
+                @if (durationWarning()) {
+                  <span>{{ durationWarning() }}</span>
+                } @else {
+                  <span>⏱️ Duración estimada: <strong>{{ calculatedDays() }} días</strong> (Límite: {{ tool()!.maxDiasPrestamo }} días)</span>
+                }
+              </div>
+            }
+
+            <div class="form-group">
+              <label for="notas">Mensaje o Motivo para el Dueño (Opcional)</label>
+              <textarea
+                id="notas"
+                name="notas"
+                rows="3"
+                [(ngModel)]="notasSolicitante"
+                placeholder="Ej: Necesito colocar unas repisas flotantes en mi estudio este sábado."
+              ></textarea>
+            </div>
+
+            <div class="policy-notice">
+              <small>ℹ️ El préstamo es solidario y gratuito. Al confirmar, el propietario recibirá la notificación para aprobar el retiro.</small>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-block btn-submit-loan"
+              [disabled]="isSubmitting() || !!durationWarning()"
+            >
+              @if (isSubmitting()) {
+                <span>Verificando colisión de fechas...</span>
+              } @else {
+                <span>Confirmar Solicitud de Préstamo</span>
+              }
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

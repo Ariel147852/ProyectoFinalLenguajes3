@@ -1,0 +1,97 @@
+<div class="catalog-container">
+  <div class="catalog-header">
+    <div class="header-text">
+      <span class="catalog-badge">📦 Inventario Abierto Comunitario</span>
+      <h1>Catálogo de Herramientas</h1>
+      <p>Equipos compartidos por los vecinos de la comunidad. Préstamos 100% gratuitos y solidarios.</p>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="updateSearchQuery($event)"
+        (keyup.enter)="onSearch()"
+        placeholder="Buscar por taladro, podadora, sierra, escalera..."
+      />
+      <button (click)="onSearch()" class="btn btn-primary">Buscar</button>
+    </div>
+  </div>
+
+  <!-- Category Pills Bar -->
+  <div class="category-pills-bar">
+    <div class="category-pills">
+      @for (cat of categories; track cat.id) {
+        <button
+          class="pill"
+          [class.active]="selectedCategory() === cat.id"
+          (click)="onFilterChange(cat.id)"
+        >
+          {{ cat.label }}
+        </button>
+      }
+    </div>
+    <div class="results-count">
+      @if (!isLoading()) {
+        <span>{{ tools().length }} herramientas disponibles</span>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando inventario de herramientas comunitarias...</p>
+    </div>
+  } @else if (tools().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon">🔍</span>
+      <h3>No se encontraron herramientas en esta categoría</h3>
+      <p>Intenta con otros términos de búsqueda o selecciona "Todas las categorías".</p>
+      <button (click)="onFilterChange('todas')" class="btn btn-outline">Ver todas las herramientas</button>
+    </div>
+  } @else {
+    <div class="tools-grid">
+      @for (tool of tools(); track tool._id) {
+        <div class="tool-card">
+          <div class="tool-image-container">
+            <img
+              [src]="tool.imagenes[0] || 'https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&w=600&q=80'"
+              [alt]="tool.nombre"
+              class="tool-image"
+              loading="lazy"
+            />
+            <span class="condition-badge" [class]="tool.estadoFisico">
+              {{ tool.estadoFisico | titlecase }}
+            </span>
+            <span class="free-badge">Préstamo $0</span>
+          </div>
+
+          <div class="tool-content">
+            <div class="tool-meta">
+              <span class="category-tag">{{ tool.categoria | uppercase }}</span>
+              <span class="location-tag">📍 {{ tool.direccionZona }}</span>
+            </div>
+
+            <h3 class="tool-title">{{ tool.nombre }}</h3>
+            <p class="tool-description">{{ tool.descripcion }}</p>
+
+            <div class="tool-footer">
+              <div class="loan-period">
+                ⏱️ Máx. <strong>{{ tool.maxDiasPrestamo }} días</strong>
+              </div>
+              <a [routerLink]="['/tools', tool._id]" class="btn btn-sm btn-primary">
+                Ver y Reservar
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

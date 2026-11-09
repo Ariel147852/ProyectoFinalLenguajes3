@@ -1,0 +1,116 @@
+<div class="form-container">
+  <div class="form-card">
+    <div class="form-header">
+      <h2>Publicar Herramienta para la Comunidad</h2>
+      <p>Comparte un equipo que tengas en casa y ayuda a tus vecinos a completar sus proyectos</p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-error">{{ errorMessage }}</div>
+    }
+
+    <form (ngSubmit)="onSubmit()" class="tool-editor-form">
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <label for="nombre">Nombre de la Herramienta *</label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            [(ngModel)]="nombre"
+            placeholder="Ej: Taladro Percutor 750W con maletín"
+            required
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="categoria">Categoría *</label>
+          <select id="categoria" name="categoria" [(ngModel)]="categoria">
+            @for (cat of categories; track cat.id) {
+              <option [value]="cat.id">{{ cat.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción y Condiciones de Uso *</label>
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          rows="3"
+          [(ngModel)]="descripcion"
+          placeholder="Describe accesorios incluidos, precauciones de seguridad, brocas, etc."
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="estadoFisico">Estado Físico</label>
+          <select id="estadoFisico" name="estadoFisico" [(ngModel)]="estadoFisico">
+            <option value="excelente">Excelente (Como nueva)</option>
+            <option value="bueno">Bueno (Funcional con marcas de uso)</option>
+            <option value="regular">Regular (Operativa básica)</option>
+          </select>
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="maxDias">Préstamo Máximo (Días)</label>
+          <input
+            type="number"
+            id="maxDias"
+            name="maxDias"
+            [(ngModel)]="maxDiasPrestamo"
+            min="1"
+            max="30"
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="direccionZona">Barrio o Zona de Retiro *</label>
+          <input
+            type="text"
+            id="direccionZona"
+            name="direccionZona"
+            [(ngModel)]="direccionZona"
+            placeholder="Ej: Sector La Floresta"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="imagenUrl">URL de Fotografía (Opcional)</label>
+        <input
+          type="url"
+          id="imagenUrl"
+          name="imagenUrl"
+          [(ngModel)]="imagenUrl"
+          placeholder="https://images.unsplash.com/photo-..."
+        />
+      </div>
+
+      <!-- Map Coordinate Picker Section -->
+      <div class="map-picker-section">
+        <div class="picker-label-row">
+          <label>📍 Ubicación Geográfica en el Mapa (Haz clic o arrastra el marcador)</label>
+          <span class="coords-display">Lat: {{ latitud }}, Lng: {{ longitud }}</span>
+        </div>
+        <div id="picker-map" class="picker-map-frame"></div>
+      </div>
+
+      <div class="form-actions">
+        <a routerLink="/catalog" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          @if (isLoading) {
+            <span>Publicando...</span>
+          } @else {
+            <span>Publicar Herramienta</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

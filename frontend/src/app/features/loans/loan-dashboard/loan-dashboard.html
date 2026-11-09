@@ -1,0 +1,160 @@
+<div class="loans-page-container">
+  <div class="loans-header">
+    <h1>Gestión de Préstamos Comunitarios</h1>
+    <p>Administra las herramientas que solicitaste y los pedidos que recibiste como dueño</p>
+  </div>
+
+  <div class="tabs-nav">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'borrowed'"
+      (click)="switchTab('borrowed')"
+    >
+      📥 Mis Solicitudes de Préstamo
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'lent'"
+      (click)="switchTab('lent')"
+    >
+      📤 Préstamos de mis Herramientas
+    </button>
+  </div>
+
+  @if (feedback()) {
+    <div class="alert" [class.alert-success]="feedbackType() === 'success'" [class.alert-error]="feedbackType() === 'error'">
+      {{ feedback() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando información de préstamos...</p>
+    </div>
+  } @else {
+    <!-- Tab 1: Borrowed by me -->
+    @if (activeTab() === 'borrowed') {
+      @if (borrowedLoans().length === 0) {
+        <div class="empty-state">
+          <p>Aún no has solicitado ningún préstamo de herramientas.</p>
+          <a routerLink="/catalog" class="btn btn-primary">Ir al Catálogo</a>
+        </div>
+      } @else {
+        <div class="loans-table-wrapper">
+          <table class="loans-table">
+            <thead>
+              <tr>
+                <th>Herramienta</th>
+                <th>Propietario</th>
+                <th>Fechas</th>
+                <th>Estado</th>
+                <th>Mensaje</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (loan of borrowedLoans(); track loan._id) {
+                <tr>
+                  <td>
+                    <strong>{{ $any(loan.herramientaId)?.nombre || 'Herramienta' }}</strong>
+                  </td>
+                  <td>
+                    {{ $any(loan.propietarioId)?.nombre }}
+                    <small class="block text-muted">{{ $any(loan.propietarioId)?.telefono }}</small>
+                  </td>
+                  <td>
+                    {{ loan.fechaInicio | date:'dd/MM/yyyy' }} al {{ loan.fechaFin | date:'dd/MM/yyyy' }}
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="loan.estado">
+                      {{ loan.estado | uppercase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="note-text">{{ loan.notasSolicitante || 'Sin notas' }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    <!-- Tab 2: Lent by me (I am the owner) -->
+    @if (activeTab() === 'lent') {
+      @if (lentLoans().length === 0) {
+        <div class="empty-state">
+          <p>No tienes solicitudes de préstamo pendientes sobre tus herramientas publicadas.</p>
+        </div>
+      } @else {
+        <div class="loans-table-wrapper">
+          <table class="loans-table">
+            <thead>
+              <tr>
+                <th>Herramienta</th>
+                <th>Solicitante</th>
+                <th>Fechas</th>
+                <th>Estado</th>
+                <th>Acciones del Propietario</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (loan of lentLoans(); track loan._id) {
+                <tr>
+                  <td>
+                    <strong>{{ $any(loan.herramientaId)?.nombre || 'Herramienta' }}</strong>
+                  </td>
+                  <td>
+                    {{ $any(loan.solicitanteId)?.nombre }}
+                    <small class="block text-muted">Tel: {{ $any(loan.solicitanteId)?.telefono || 'N/A' }}</small>
+                  </td>
+                  <td>
+                    {{ loan.fechaInicio | date:'dd/MM/yyyy' }} al {{ loan.fechaFin | date:'dd/MM/yyyy' }}
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="loan.estado">
+                      {{ loan.estado | uppercase }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      @if (loan.estado === 'pendiente') {
+                        <button (click)="onRespond(loan._id, 'aprobar')" class="btn btn-sm btn-primary">
+                          Aprobar
+                        </button>
+                        <button (click)="onRespond(loan._id, 'rechazar')" class="btn btn-sm btn-danger">
+                          Rechazar
+                        </button>
+                      }
+
+                      @if (loan.estado === 'aprobado') {
+                        <button (click)="onDeliver(loan._id)" class="btn btn-sm btn-outline">
+                          Registrar Entrega
+                        </button>
+                      }
+
+                      @if (loan.estado === 'en_curso') {
+                        <button (click)="onReturn(loan._id)" class="btn btn-sm btn-primary">
+                          Registrar Devolución
+                        </button>
+                      }
+
+                      @if (loan.estado === 'devuelto') {
+                        <span class="completed-label">✅ Finalizado</span>
+                      }
+
+                      @if (loan.estado === 'rechazado') {
+                        <span class="text-muted">Rechazado</span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  }
+</div>

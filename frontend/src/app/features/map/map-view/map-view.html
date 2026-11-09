@@ -1,0 +1,69 @@
+<div class="map-page-container">
+  <div class="map-sidebar">
+    <div class="sidebar-header">
+      <h2>Explorador Geográfico</h2>
+      <p class="status-tip">{{ statusMessage() }}</p>
+    </div>
+
+    <div class="control-box">
+      <div class="control-group">
+        <label for="radius">Radio de Búsqueda: <strong>{{ radiusKm }} km</strong></label>
+        <input
+          type="range"
+          id="radius"
+          min="1"
+          max="30"
+          step="1"
+          [(ngModel)]="radiusKm"
+          (change)="onFiltersApply()"
+        />
+      </div>
+
+      <div class="control-group">
+        <label for="category">Filtrar por Categoría</label>
+        <select id="category" [(ngModel)]="selectedCategory" (change)="onFiltersApply()">
+          @for (cat of categories; track cat.id) {
+            <option [value]="cat.id">{{ cat.label }}</option>
+          }
+        </select>
+      </div>
+
+      <button (click)="loadNearbyTools()" class="btn btn-primary btn-block" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span>Buscando herramientas...</span>
+        } @else {
+          <span>Actualizar Resultados</span>
+        }
+      </button>
+    </div>
+
+    <!-- Results summary list -->
+    <div class="results-container">
+      <div class="results-header">
+        <h3>Herramientas en el área ({{ tools().length }})</h3>
+      </div>
+
+      @if (tools().length === 0 && !isLoading()) {
+        <div class="no-results">
+          <p>No se encontraron herramientas en este radio. Intenta ampliar el rango de búsqueda.</p>
+        </div>
+      }
+
+      <div class="nearby-list">
+        @for (tool of tools(); track tool._id) {
+          <div class="nearby-item">
+            <div class="nearby-info">
+              <h4>{{ tool.nombre }}</h4>
+              <p>📍 {{ tool.direccionZona }}</p>
+            </div>
+            <a [routerLink]="['/tools', tool._id]" class="btn btn-sm btn-outline">Ver</a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="map-canvas-wrapper">
+    <div id="main-map" class="map-element"></div>
+  </div>
+</div>

@@ -1,0 +1,128 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <div class="header-titles">
+      <span class="admin-badge">🛡️ Panel de Supervisión y Control</span>
+      <h1>Administración del Sistema</h1>
+      <p>Supervisa las métricas comunitarias, herramientas y el estado de los usuarios (RF16).</p>
+    </div>
+    <button (click)="loadAdminData()" class="btn btn-outline btn-refresh">
+      🔄 Actualizar Métricas
+    </button>
+  </div>
+
+  @if (actionMessage()) {
+    <div class="alert" [class.alert-success]="actionType() === 'success'" [class.alert-error]="actionType() === 'error'">
+      {{ actionMessage() }}
+    </div>
+  }
+
+  <!-- Stats Grid -->
+  @if (stats()) {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon icon-users">👥</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()?.totalUsers }}</span>
+          <span class="stat-label">Usuarios Registrados</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-tools">⚡</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()?.totalTools }}</span>
+          <span class="stat-label">Herramientas Activas</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-loans">🔄</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()?.activeLoans }}</span>
+          <span class="stat-label">Préstamos en Curso</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-completed">✅</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()?.completedLoans }}</span>
+          <span class="stat-label">Préstamos Completados</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Users Table Section -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <h2>Miembros de la Comunidad</h2>
+      <span class="count-pill">{{ users().length }} usuarios en total</span>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando lista de usuarios...</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Zona</th>
+              <th>Reputación</th>
+              <th>Estado</th>
+              <th>Acción de Moderación</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of users(); track u.id || $any(u)._id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <span class="avatar-sm">👤</span>
+                    <strong>{{ u.nombre }}</strong>
+                  </div>
+                </td>
+                <td>{{ u.email }}</td>
+                <td>
+                  <span class="role-tag" [class.role-admin]="u.rol === 'admin'">
+                    {{ u.rol | uppercase }}
+                  </span>
+                </td>
+                <td>📍 {{ u.direccionZona || 'N/A' }}</td>
+                <td>
+                  <span class="rating-badge">★ {{ u.reputacionPromedio || 5.0 }}</span>
+                </td>
+                <td>
+                  <span class="status-pill" [class.status-active]="u.activo !== false" [class.status-blocked]="u.activo === false">
+                    {{ u.activo !== false ? 'Activo' : 'Bloqueado' }}
+                  </span>
+                </td>
+                <td>
+                  @if (u.rol !== 'admin') {
+                    <button
+                      (click)="onToggleStatus(u)"
+                      class="btn btn-sm"
+                      [class.btn-danger]="u.activo !== false"
+                      [class.btn-outline]="u.activo === false"
+                    >
+                      {{ u.activo !== false ? 'Bloquear Acceso' : 'Reactivar Cuenta' }}
+                    </button>
+                  } @else {
+                    <span class="text-muted">Protegido</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
