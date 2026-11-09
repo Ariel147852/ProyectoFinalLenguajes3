@@ -12,6 +12,8 @@ const DATOS_BANCARIOS = {
   titular: 'ToolLibrary - Biblioteca Comunitaria de Herramientas',
   identificacion: '1792345678001',
   emailNotificacion: 'pagos@toollibrary.org',
+  telefonoDeUna: '0998765432',
+  qrDeUnaUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220"><rect width="100%" height="100%" fill="%23ffffff" rx="12"/><rect x="15" y="15" width="60" height="60" fill="%230f172a" rx="4"/><rect x="25" y="25" width="40" height="40" fill="%23ffffff"/><rect x="35" y="35" width="20" height="20" fill="%230f172a"/><rect x="145" y="15" width="60" height="60" fill="%230f172a" rx="4"/><rect x="155" y="25" width="40" height="40" fill="%23ffffff"/><rect x="165" y="35" width="20" height="20" fill="%230f172a"/><rect x="15" y="145" width="60" height="60" fill="%230f172a" rx="4"/><rect x="25" y="155" width="40" height="40" fill="%23ffffff"/><rect x="35" y="165" width="20" height="20" fill="%230f172a"/><rect x="90" y="20" width="40" height="15" fill="%237c3aed"/><rect x="90" y="45" width="20" height="30" fill="%230f172a"/><rect x="100" y="90" width="45" height="35" fill="%237c3aed"/><rect x="155" y="95" width="50" height="25" fill="%230f172a"/><rect x="90" y="145" width="30" height="50" fill="%230f172a"/><rect x="135" y="145" width="65" height="50" fill="%237c3aed"/><circle cx="110" cy="110" r="18" fill="%23fbbf24"/><text x="110" y="116" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="%230f172a" text-anchor="middle">D</text></svg>',
   precios: {
     suscripcionMensual: 5.0,
     limiteHerramientasBase: 5,

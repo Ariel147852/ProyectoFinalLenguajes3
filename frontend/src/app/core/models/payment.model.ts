@@ -42,6 +42,8 @@ export interface BankDetails {
   titular: string;
   identificacion: string;
   emailNotificacion: string;
+  telefonoDeUna?: string;
+  qrDeUnaUrl?: string;
   precios: {
     suscripcionMensual: number;
     limiteHerramientasBase: number;

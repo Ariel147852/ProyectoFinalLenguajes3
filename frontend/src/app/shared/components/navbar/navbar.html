@@ -16,9 +16,23 @@
       <a routerLink="/map" routerLinkActive="active">Mapa Cercano</a>
 
       @if (authService.isAuthenticated()) {
-        <a routerLink="/loans" routerLinkActive="active">Mis Préstamos</a>
-        <a routerLink="/financial-data" routerLinkActive="active">💰 Datos Financieros (QR)</a>
-        <a routerLink="/subscription" routerLinkActive="active">💳 Suscripción</a>
+        <a routerLink="/loans" routerLinkActive="active">📋 Mis Préstamos</a>
+        <a
+          routerLink="/financial-data"
+          routerLinkActive="active"
+          class="nav-link-cobros"
+          title="Configura tu cuenta y QR de DeUna para recibir pagos cuando prestas herramientas"
+        >
+          📥 Cobros (Mi QR)
+        </a>
+        <a
+          routerLink="/subscription"
+          routerLinkActive="active"
+          class="nav-link-plan"
+          title="Membresía de $5/mes para publicar herramientas en la plataforma"
+        >
+          ⭐ Mi Plan ($5)
+        </a>
         
         @if (authService.isAdmin()) {
           <a routerLink="/admin" routerLinkActive="active" class="admin-link">🛡️ Panel Admin</a>

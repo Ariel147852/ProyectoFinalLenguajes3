@@ -1,9 +1,9 @@
 <div class="financial-page-container">
   <div class="financial-header">
-    <div class="header-badge">💳 Configuración de Pagos Comunitarios</div>
-    <h1>Mis Datos Financieros y Código QR DeUna</h1>
+    <div class="header-badge">📥 Módulo de Cobros (Prestamista)</div>
+    <h1>Mis Datos de Cobro y Código QR DeUna</h1>
     <p>
-      Configura tu información bancaria y tu Código QR DeUna para que los vecinos que soliciten tus herramientas puedan realizar transferencias y pagos de forma inmediata.
+      Configura tu cuenta bancaria y tu Código QR DeUna para recibir los pagos de los préstamos de tus herramientas. El prestatario verá esta información durante el reloj de 15 minutos para transferirte directamente.
     </p>
   </div>
 
@@ -139,6 +139,61 @@
           <p>
             Al tener tu QR DeUna configurado, cada vez que un vecino te pida una herramienta, el sistema le mostrará tu QR con un <strong>reloj de 15 minutos</strong> para que realice el pago y suba su comprobante.
           </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Preview for the Borrower -->
+  <div class="live-preview-section">
+    <div class="preview-header">
+      <span class="preview-badge">👁️ Simulación en Vivo</span>
+      <h2>Así verá el prestatario tus datos al momento de pagarte:</h2>
+      <p>Cuando un vecino reserve una herramienta tuya, se abrirá el modal de pago con tu información en este formato:</p>
+    </div>
+
+    <div class="preview-card-wrapper">
+      <div class="preview-modal-simulation">
+        <div class="sim-header">
+          <span class="sim-pill">⏳ Reloj Activo (15:00 min)</span>
+          <h4>Pagar a: {{ titular || 'Tu Nombre' }}</h4>
+        </div>
+
+        <div class="sim-grid">
+          <div class="sim-qr-box">
+            @if (qrDeUnaUrl) {
+              <img [src]="qrDeUnaUrl" alt="QR Vista Previa" class="sim-qr-img" />
+              <span class="sim-qr-label">📲 QR DeUna Listo para Escanear</span>
+            } @else {
+              <div class="sim-qr-placeholder">
+                <span class="placeholder-icon">🔳</span>
+                <p>Sin Código QR DeUna cargado aún</p>
+              </div>
+            }
+          </div>
+
+          <div class="sim-info-box">
+            <div class="sim-data-row">
+              <span class="sim-key">Banco:</span>
+              <strong class="sim-val">{{ banco }}</strong>
+            </div>
+            <div class="sim-data-row">
+              <span class="sim-key">Tipo de Cuenta:</span>
+              <span class="sim-val">{{ tipoCuenta }}</span>
+            </div>
+            <div class="sim-data-row">
+              <span class="sim-key">N° de Cuenta:</span>
+              <strong class="sim-val mono">{{ numeroCuenta || '(Sin registrar)' }}</strong>
+            </div>
+            <div class="sim-data-row">
+              <span class="sim-key">Titular:</span>
+              <span class="sim-val">{{ titular || '(Sin registrar)' }}</span>
+            </div>
+            <div class="sim-data-row">
+              <span class="sim-key">Teléfono DeUna:</span>
+              <strong class="sim-val mono">{{ telefonoDeUna || '(Sin registrar)' }}</strong>
+            </div>
+          </div>
         </div>
       </div>
     </div>

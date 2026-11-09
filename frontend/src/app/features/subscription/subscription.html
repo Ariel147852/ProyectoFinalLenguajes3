@@ -139,56 +139,109 @@
 
   <!-- Bank Information & Payment Submission Section -->
   <div class="payment-action-section">
-    <!-- Bank Details Card -->
+    <!-- Official Platform Account Card -->
     <div class="bank-card">
       <div class="bank-card-header">
-        <span class="bank-icon">🏦</span>
+        <span class="bank-icon">🏛️</span>
         <div>
-          <h3>Datos para Transferencia Bancaria</h3>
-          <p>Realiza tu transferencia o depósito y sube tu comprobante a continuación:</p>
+          <h3>Cuentas Oficiales de ToolLibrary</h3>
+          <p>Transfiere o paga con DeUna a la plataforma y sube tu comprobante:</p>
         </div>
       </div>
 
-      @if (bankDetails(); as b) {
-        <div class="bank-data-list">
-          <div class="bank-row">
-            <span class="row-label">Institución Financiera:</span>
-            <span class="row-value highlight-value"><strong>{{ b.banco }}</strong></span>
-          </div>
-          <div class="bank-row">
-            <span class="row-label">Tipo de Cuenta:</span>
-            <span class="row-value">{{ b.tipoCuenta }}</span>
-          </div>
-          <div class="bank-row">
-            <span class="row-label">Número de Cuenta:</span>
-            <span class="row-value mono-value"><strong>{{ b.numeroCuenta }}</strong></span>
-          </div>
-          <div class="bank-row">
-            <span class="row-label">Titular / Beneficiario:</span>
-            <span class="row-value">{{ b.titular }}</span>
-          </div>
-          <div class="bank-row">
-            <span class="row-label">RUC / Cédula:</span>
-            <span class="row-value mono-value">{{ b.identificacion }}</span>
-          </div>
-          <div class="bank-row">
-            <span class="row-label">Correo para Notificación:</span>
-            <span class="row-value">{{ b.emailNotificacion }}</span>
-          </div>
-        </div>
-
-        <button (click)="copyBankInfo()" class="btn btn-outline btn-copy-bank" type="button">
-          @if (copiedNotice()) {
-            <span>✓ ¡Datos copiados al portapapeles!</span>
-          } @else {
-            <span>📋 Copiar Datos Bancarios</span>
-          }
+      <!-- Tab Buttons for Platform Payment -->
+      <div class="platform-payment-tabs">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.tab-btn-active]="metodoPlataforma === 'deuna'"
+          (click)="metodoPlataforma = 'deuna'"
+        >
+          📲 DeUna (Código QR)
         </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.tab-btn-active]="metodoPlataforma === 'transferencia'"
+          (click)="metodoPlataforma = 'transferencia'"
+        >
+          🏦 Transferencia Bancaria
+        </button>
+      </div>
+
+      @if (bankDetails(); as b) {
+        @if (metodoPlataforma === 'deuna') {
+          <div class="deuna-official-box">
+            <div class="deuna-qr-center">
+              @if (b.qrDeUnaUrl) {
+                <img [src]="b.qrDeUnaUrl" alt="QR DeUna ToolLibrary Oficial" class="deuna-platform-qr" />
+              }
+              <div class="deuna-scan-tag">⚡ Escanea desde la App DeUna</div>
+            </div>
+            <div class="deuna-info-rows">
+              <div class="bank-row">
+                <span class="row-label">Celular DeUna:</span>
+                <span class="row-value highlight-value"><strong>{{ b.telefonoDeUna || '0998765432' }}</strong></span>
+              </div>
+              <div class="bank-row">
+                <span class="row-label">Beneficiario Oficial:</span>
+                <span class="row-value"><strong>{{ b.titular }}</strong></span>
+              </div>
+              <div class="bank-row">
+                <span class="row-label">Banco Asociado:</span>
+                <span class="row-value">{{ b.banco }} (DeUna)</span>
+              </div>
+            </div>
+
+            <button (click)="copyDeUnaInfo()" class="btn btn-outline btn-copy-bank" type="button">
+              @if (copiedNotice() && copiedType() === 'deuna') {
+                <span>✓ ¡Datos de DeUna copiados!</span>
+              } @else {
+                <span>📲 Copiar Celular DeUna ({{ b.telefonoDeUna || '0998765432' }})</span>
+              }
+            </button>
+          </div>
+        } @else {
+          <div class="bank-data-list">
+            <div class="bank-row">
+              <span class="row-label">Institución Financiera:</span>
+              <span class="row-value highlight-value"><strong>{{ b.banco }}</strong></span>
+            </div>
+            <div class="bank-row">
+              <span class="row-label">Tipo de Cuenta:</span>
+              <span class="row-value">{{ b.tipoCuenta }}</span>
+            </div>
+            <div class="bank-row">
+              <span class="row-label">Número de Cuenta:</span>
+              <span class="row-value mono-value"><strong>{{ b.numeroCuenta }}</strong></span>
+            </div>
+            <div class="bank-row">
+              <span class="row-label">Titular / Beneficiario:</span>
+              <span class="row-value">{{ b.titular }}</span>
+            </div>
+            <div class="bank-row">
+              <span class="row-label">RUC / Cédula:</span>
+              <span class="row-value mono-value">{{ b.identificacion }}</span>
+            </div>
+            <div class="bank-row">
+              <span class="row-label">Correo para Notificación:</span>
+              <span class="row-value">{{ b.emailNotificacion }}</span>
+            </div>
+          </div>
+
+          <button (click)="copyBankInfo()" class="btn btn-outline btn-copy-bank" type="button">
+            @if (copiedNotice() && copiedType() === 'banco') {
+              <span>✓ ¡Datos bancarios copiados!</span>
+            } @else {
+              <span>📋 Copiar Datos Bancarios</span>
+            }
+          </button>
+        }
       }
 
       <div class="bank-instructions-note">
         <p>
-          ℹ️ <strong>Importante:</strong> El administrador revisará tu comprobante bancario. Una vez verificado el saldo, tu suscripción o herramientas adicionales se habilitarán automáticamente.
+          ℹ️ <strong>Verificación por Administrador:</strong> Tras pagar los ${{ totalPagar.toFixed(2) }}, adjunta la captura o voucher en el formulario. El administrador validará el comprobante para activar tus beneficios.
         </p>
       </div>
     </div>

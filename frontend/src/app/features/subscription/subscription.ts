@@ -23,6 +23,10 @@ export class SubscriptionComponent implements OnInit {
   feedbackMessage = signal<string>('');
   feedbackType = signal<'success' | 'error'>('success');
   copiedNotice = signal<boolean>(false);
+  copiedType = signal<string>('');
+
+  // Selector de método para ver cuenta oficial de la plataforma
+  metodoPlataforma: 'deuna' | 'transferencia' = 'deuna';
 
   // Formulario de Pago
   tipoPago: 'suscripcion_mensual' | 'herramientas_extras' = 'suscripcion_mensual';
@@ -179,7 +183,26 @@ export class SubscriptionComponent implements OnInit {
     const textToCopy = `Banco: ${details.banco}\nTipo: ${details.tipoCuenta}\nNúmero: ${details.numeroCuenta}\nTitular: ${details.titular}\nRUC: ${details.identificacion}\nCorreo: ${details.emailNotificacion}`;
     navigator.clipboard.writeText(textToCopy).then(() => {
       this.copiedNotice.set(true);
-      setTimeout(() => this.copiedNotice.set(false), 3000);
+      this.copiedType.set('banco');
+      setTimeout(() => {
+        this.copiedNotice.set(false);
+        this.copiedType.set('');
+      }, 3000);
+    });
+  }
+
+  copyDeUnaInfo(): void {
+    const details = this.bankDetails();
+    if (!details) return;
+
+    const textToCopy = `DeUna Oficial ToolLibrary\nCelular: ${details.telefonoDeUna || '0998765432'}\nTitular: ${details.titular}`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      this.copiedNotice.set(true);
+      this.copiedType.set('deuna');
+      setTimeout(() => {
+        this.copiedNotice.set(false);
+        this.copiedType.set('');
+      }, 3000);
     });
   }
 

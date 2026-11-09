@@ -424,6 +424,84 @@
   color: #059669;
 }
 
+.platform-payment-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  background: #f1f5f9;
+  padding: 0.35rem;
+  border-radius: 0.65rem;
+}
+
+.platform-payment-tabs .tab-btn {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.platform-payment-tabs .tab-btn:hover {
+  color: #0f172a;
+}
+
+.platform-payment-tabs .tab-btn-active {
+  background: white;
+  color: #0f172a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.deuna-official-box {
+  background: #faf5ff;
+  border: 1.5px solid #e9d5ff;
+  border-radius: 0.85rem;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.deuna-qr-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.deuna-platform-qr {
+  width: 170px;
+  height: 170px;
+  background: white;
+  padding: 0.6rem;
+  border-radius: 0.85rem;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+  border: 2px solid #c084fc;
+}
+
+.deuna-scan-tag {
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #7c3aed;
+  background: #f3e8ff;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.deuna-info-rows {
+  background: white;
+  border-radius: 0.65rem;
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1rem;
+  border: 1px solid #f3e8ff;
+}
+
 .mono-value {
   font-family: monospace;
   font-size: 0.98rem;
