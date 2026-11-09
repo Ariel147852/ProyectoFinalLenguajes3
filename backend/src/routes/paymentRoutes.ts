@@ -23,5 +23,7 @@ router.post('/comprobante', authenticateJWT, crearComprobantePago);
 // Endpoints de administración para verificar y listar comprobantes
 router.get('/admin/comprobantes', authenticateJWT, requireRole('admin'), getTodosComprobantes);
 router.put('/admin/comprobantes/:id/verificar', authenticateJWT, requireRole('admin'), verificarComprobante);
+router.patch('/admin/comprobantes/:id/verificar', authenticateJWT, requireRole('admin'), verificarComprobante);
 
 export default router;
+

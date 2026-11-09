@@ -95,3 +95,4 @@ PaymentReceiptSchema.index({ usuarioId: 1, createdAt: -1 });
 PaymentReceiptSchema.index({ estado: 1, createdAt: -1 });
 
 export const PaymentReceipt = model<IPaymentReceipt>('PaymentReceipt', PaymentReceiptSchema);
+

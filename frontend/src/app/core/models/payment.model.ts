@@ -48,3 +48,4 @@ export interface BankDetails {
     precioHerramientaExtra: number;
   };
 }
+

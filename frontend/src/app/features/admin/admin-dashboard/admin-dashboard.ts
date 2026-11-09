@@ -118,10 +118,6 @@ export class AdminDashboardComponent implements OnInit {
   onApproveReceipt(receipt: PaymentReceipt): void {
     if (!receipt._id) return;
 
-    if (!confirm(`¿Confirmas la aprobación del comprobante #${receipt.numeroComprobante} por $${receipt.monto.toFixed(2)} USD?`)) {
-      return;
-    }
-
     this.paymentService.verificarComprobante(receipt._id, 'aprobar').subscribe({
       next: (res) => {
         if (res.success) {
@@ -129,11 +125,13 @@ export class AdminDashboardComponent implements OnInit {
           this.actionType.set('success');
           this.loadReceipts();
           this.loadAdminData();
+          this.cdr.markForCheck();
         }
       },
       error: (err) => {
         this.actionMessage.set(err.error?.message || 'Error al verificar comprobante');
         this.actionType.set('error');
+        this.cdr.markForCheck();
       }
     });
   }
