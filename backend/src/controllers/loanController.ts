@@ -39,12 +39,9 @@ export const requestLoan = async (req: AuthenticatedRequest, res: Response, next
       return;
     }
 
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-
-    // Validación de coherencia de fechas
-    const validation = LoanService.validateDates(inicio, fin, tool.maxDiasPrestamo);
-    if (!validation.valid) {
+    // Validación de coherencia de fechas sin desfaces de zona horaria
+    const validation = LoanService.validateDates(fechaInicio, fechaFin, tool.maxDiasPrestamo);
+    if (!validation.valid || !validation.inicio || !validation.fin) {
       ApiResponse.error({
         res,
         statusCode: 400,
@@ -52,6 +49,9 @@ export const requestLoan = async (req: AuthenticatedRequest, res: Response, next
       });
       return;
     }
+
+    const inicio = validation.inicio;
+    const fin = validation.fin;
 
     // Regla de Negocio Crítica: Anti-solapamiento de fechas
     const hasOverlap = await LoanService.checkOverlap(herramientaId, inicio, fin);

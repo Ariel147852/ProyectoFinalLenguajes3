@@ -98,6 +98,7 @@
                 type="date"
                 id="fechaInicio"
                 name="fechaInicio"
+                [min]="todayStr"
                 [(ngModel)]="fechaInicio"
                 (ngModelChange)="onDatesChanged()"
                 required
@@ -110,6 +111,7 @@
                 type="date"
                 id="fechaFin"
                 name="fechaFin"
+                [min]="fechaInicio || todayStr"
                 [(ngModel)]="fechaFin"
                 (ngModelChange)="onDatesChanged()"
                 required

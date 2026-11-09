@@ -25,6 +25,7 @@ export class ToolDetailComponent implements OnInit {
   fechaInicio = '';
   fechaFin = '';
   notasSolicitante = '';
+  todayStr = '';
 
   // Cálculos dinámicos
   calculatedDays = signal<number | null>(null);
@@ -43,6 +44,12 @@ export class ToolDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    this.todayStr = `${year}-${month}-${day}`;
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadToolDetails(id);
@@ -84,8 +91,10 @@ export class ToolDetailComponent implements OnInit {
       return;
     }
 
-    const start = new Date(this.fechaInicio);
-    const end = new Date(this.fechaFin);
+    const [sy, sm, sd] = this.fechaInicio.split('-').map(Number);
+    const [ey, em, ed] = this.fechaFin.split('-').map(Number);
+    const start = new Date(sy, sm - 1, sd);
+    const end = new Date(ey, em - 1, ed);
 
     if (end < start) {
       this.calculatedDays.set(null);
@@ -94,7 +103,7 @@ export class ToolDetailComponent implements OnInit {
     }
 
     const diffMs = end.getTime() - start.getTime();
-    const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1;
+    const days = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
     this.calculatedDays.set(days);
 
     const maxAllowed = this.tool()?.maxDiasPrestamo || 30;
