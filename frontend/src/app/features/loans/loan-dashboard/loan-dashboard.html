@@ -12,6 +12,9 @@
       (click)="switchTab('borrowed')"
     >
       📥 Mis Solicitudes de Préstamo (Prestatario)
+      @if (borrowedLoans().length > 0) {
+        <span class="tab-count-badge">{{ borrowedLoans().length }}</span>
+      }
     </button>
     <button
       class="tab-btn"
@@ -19,6 +22,12 @@
       (click)="switchTab('lent')"
     >
       📤 Préstamos de mis Herramientas (Prestamista)
+      @if (lentLoans().length > 0) {
+        <span class="tab-count-badge">{{ lentLoans().length }}</span>
+      }
+      @if (pendingLentValidationCount > 0) {
+        <span class="tab-alert-badge">⚡ {{ pendingLentValidationCount }} por validar</span>
+      }
     </button>
   </div>
 
@@ -166,8 +175,8 @@
                     <strong>{{ $any(loan.herramientaId)?.nombre || 'Herramienta' }}</strong>
                   </td>
                   <td>
-                    <strong>{{ $any(loan.solicitanteId)?.nombre }}</strong>
-                    <div class="text-muted small">📞 {{ $any(loan.solicitanteId)?.telefono }}</div>
+                    <strong>{{ $any(loan.solicitanteId)?.nombre || 'Vecino Solicitante' }}</strong>
+                    <div class="text-muted small">📞 {{ $any(loan.solicitanteId)?.telefono || 'Contacto disponible en chat' }}</div>
                     @if ($any(loan.solicitanteId)?.cedula) {
                       <div class="text-muted small">🪪 CI: {{ $any(loan.solicitanteId)?.cedula }}</div>
                     }

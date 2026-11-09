@@ -56,48 +56,71 @@ export class LoanDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Control de pestaña inicial resuelta
+  private initialTabResolved = false;
+
+  get pendingLentValidationCount(): number {
+    return this.lentLoans().filter(
+      l => l.estadoPago === 'pendiente_validacion' || (l.estado === 'pendiente' && !!l.comprobantePagoUrl)
+    ).length;
+  }
+
   loadData(): void {
     this.isLoading.set(true);
     this.feedback.set('');
 
-    if (this.activeTab() === 'borrowed') {
-      this.loanService.getMyBorrowedLoans().subscribe({
-        next: (res) => {
-          this.isLoading.set(false);
-          if (res.success && res.data) {
-            this.borrowedLoans.set(res.data);
+    let borrowedLoaded = false;
+    let lentLoaded = false;
+
+    const checkBothDone = () => {
+      if (borrowedLoaded && lentLoaded) {
+        this.isLoading.set(false);
+        // Si el usuario no tiene préstamos como prestatario pero sí tiene solicitudes de sus herramientas, auto-abrir pestaña Prestamista
+        if (!this.initialTabResolved) {
+          this.initialTabResolved = true;
+          if (this.borrowedLoans().length === 0 && this.lentLoans().length > 0) {
+            this.activeTab.set('lent');
           }
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          this.isLoading.set(false);
-          this.feedback.set(err.error?.message || 'Error al cargar los préstamos solicitados');
-          this.feedbackType.set('error');
-          this.cdr.markForCheck();
         }
-      });
-    } else {
-      this.loanService.getMyLentLoans().subscribe({
-        next: (res) => {
-          this.isLoading.set(false);
-          if (res.success && res.data) {
-            this.lentLoans.set(res.data);
-          }
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          this.isLoading.set(false);
-          this.feedback.set(err.error?.message || 'Error al cargar las solicitudes de tus herramientas');
-          this.feedbackType.set('error');
-          this.cdr.markForCheck();
+        this.cdr.markForCheck();
+      }
+    };
+
+    this.loanService.getMyBorrowedLoans().subscribe({
+      next: (res) => {
+        borrowedLoaded = true;
+        if (res.success && res.data) {
+          this.borrowedLoans.set(res.data);
         }
-      });
-    }
+        checkBothDone();
+      },
+      error: (err) => {
+        borrowedLoaded = true;
+        this.feedback.set(err.error?.message || 'Error al cargar los préstamos solicitados');
+        this.feedbackType.set('error');
+        checkBothDone();
+      }
+    });
+
+    this.loanService.getMyLentLoans().subscribe({
+      next: (res) => {
+        lentLoaded = true;
+        if (res.success && res.data) {
+          this.lentLoans.set(res.data);
+        }
+        checkBothDone();
+      },
+      error: (err) => {
+        lentLoaded = true;
+        this.feedback.set(err.error?.message || 'Error al cargar las solicitudes de tus herramientas');
+        this.feedbackType.set('error');
+        checkBothDone();
+      }
+    });
   }
 
   switchTab(tab: 'borrowed' | 'lent'): void {
     this.activeTab.set(tab);
-    this.loadData();
   }
 
   // Cuenta regresiva de 15 minutos
@@ -189,19 +212,12 @@ export class LoanDashboardComponent implements OnInit, OnDestroy {
 
   // Validación de pago por el prestador
   onValidarPago(loanId: string, accion: 'validar' | 'rechazar'): void {
-    const promptMsg =
-      accion === 'validar'
-        ? '¿Confirmas que recibiste el pago y deseas aprobar este préstamo?'
-        : '¿Deseas rechazar este pago y liberar la herramienta?';
-
-    if (!confirm(promptMsg)) return;
-
     this.loanService.validarPago(loanId, accion).subscribe({
       next: (res) => {
         if (res.success) {
           this.feedback.set(
             accion === 'validar'
-              ? '✓ Pago validado exitosamente. Préstamo confirmado.'
+              ? '✓ Pago validado exitosamente. Préstamo confirmado y aprobado.'
               : '✕ Pago rechazado. Herramienta liberada.'
           );
           this.feedbackType.set('success');
