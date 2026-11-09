@@ -3,10 +3,10 @@ import {
   OnInit,
   OnDestroy,
   signal,
-  effect,
   ViewChild,
   ElementRef,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  HostListener
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,21 @@ import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ChatService } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { ChatMessage } from '../../../core/models/chat.model';
+import { ChatMessage, ChatContentType } from '../../../core/models/chat.model';
+
+export interface PendingMedia {
+  tipo: 'imagen' | 'video';
+  url: string;
+  name: string;
+}
+
+export interface LightboxData {
+  tipo: 'imagen' | 'video';
+  url: string;
+  caption?: string;
+  author?: string;
+  time?: string;
+}
 
 @Component({
   selector: 'app-chat-widget',
@@ -25,12 +39,20 @@ import { ChatMessage } from '../../../core/models/chat.model';
 })
 export class ChatWidgetComponent implements OnInit, OnDestroy {
   @ViewChild('messagesScroll') private messagesScrollContainer!: ElementRef;
+  @ViewChild('fileInput') private fileInputRef!: ElementRef<HTMLInputElement>;
 
   isOpen = signal<boolean>(false);
   isConnected = signal<boolean>(false);
   messages = signal<ChatMessage[]>([]);
   newMessage = '';
   unreadCount = signal<number>(0);
+
+  // Multimedia adjunta pendiente de envío
+  pendingMedia = signal<PendingMedia | null>(null);
+  uploadError = signal<string>('');
+
+  // Vista en Pantalla Completa (Lightbox)
+  activeLightbox = signal<LightboxData | null>(null);
 
   private subscriptions: Subscription = new Subscription();
 
@@ -87,8 +109,61 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Manejo de selección de archivo imagen/video
+  onAttachClick(): void {
+    if (this.fileInputRef) {
+      this.fileInputRef.nativeElement.click();
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    this.uploadError.set('');
+
+    // Límite de tamaño: 8 MB
+    const maxSizeBytes = 8 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      this.uploadError.set('El archivo excede el tamaño máximo permitido de 8 MB');
+      target.value = '';
+      return;
+    }
+
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+
+    if (!isImage && !isVideo) {
+      this.uploadError.set('Formato no compatible. Por favor sube una imagen o video.');
+      target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      this.pendingMedia.set({
+        tipo: isVideo ? 'video' : 'imagen',
+        url: result,
+        name: file.name
+      });
+      target.value = '';
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  cancelPendingMedia(): void {
+    this.pendingMedia.set(null);
+    this.uploadError.set('');
+  }
+
   onSendMessage(): void {
-    if (!this.newMessage.trim()) return;
+    const text = this.newMessage.trim();
+    const media = this.pendingMedia();
+
+    if (!text && !media) return;
 
     const user = this.authService.currentUser();
     if (!user) return;
@@ -99,10 +174,37 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
       usuarioId: targetUserId,
       nombreUsuario: user.nombre,
       rolUsuario: user.rol,
-      mensaje: this.newMessage
+      mensaje: text,
+      tipoContenido: media ? media.tipo : 'texto',
+      mediaUrl: media ? media.url : ''
     });
 
     this.newMessage = '';
+    this.pendingMedia.set(null);
+    this.uploadError.set('');
+  }
+
+  // Lightbox / Pantalla Grande
+  openLightbox(msg: ChatMessage, tipo: 'imagen' | 'video'): void {
+    if (!msg.mediaUrl) return;
+    this.activeLightbox.set({
+      tipo,
+      url: msg.mediaUrl,
+      caption: msg.mensaje,
+      author: msg.nombreUsuario,
+      time: msg.createdAt
+    });
+  }
+
+  closeLightbox(): void {
+    this.activeLightbox.set(null);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapePress(): void {
+    if (this.activeLightbox()) {
+      this.closeLightbox();
+    }
   }
 
   isMyMessage(msg: ChatMessage): boolean {

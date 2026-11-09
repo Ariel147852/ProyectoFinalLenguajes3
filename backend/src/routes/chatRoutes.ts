@@ -7,3 +7,4 @@ const router = Router();
 router.get('/history', getRecentMessages);
 
 export default router;
+

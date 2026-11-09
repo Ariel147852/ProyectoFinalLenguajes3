@@ -29,16 +29,16 @@
       <button (click)="toggleChat()" class="btn-close-chat" title="Cerrar chat">✕</button>
     </div>
 
-    <!-- Subtitle channel info -->
+    <!-- Channel info -->
     <div class="channel-banner">
-      <span>📣 Canal: <strong>#general</strong> — Coordina préstamos y entregas</span>
+      <span>📣 Canal: <strong>#general</strong> — Envía mensajes, fotos y videos de tus herramientas</span>
     </div>
 
     <!-- Messages Container -->
     <div class="chatbox-messages" #messagesScroll>
       @if (messages().length === 0) {
         <div class="chat-empty">
-          <p>Aún no hay mensajes. ¡Sé el primero en saludar a la comunidad!</p>
+          <p>Aún no hay mensajes. ¡Sé el primero en saludar o compartir fotos de tus herramientas!</p>
         </div>
       }
 
@@ -52,35 +52,157 @@
               }
               <span class="message-time">{{ msg.createdAt | date:'HH:mm' }}</span>
             </div>
-            <p class="message-text">{{ msg.mensaje }}</p>
+
+            <!-- Contenido Multimedia (Imagen) -->
+            @if (msg.tipoContenido === 'imagen' && msg.mediaUrl) {
+              <div
+                class="media-container media-image"
+                (click)="openLightbox(msg, 'imagen')"
+                title="Haz clic para ver en pantalla completa"
+              >
+                <img [src]="msg.mediaUrl" alt="Foto compartida" class="chat-thumbnail" loading="lazy" />
+                <div class="media-hover-overlay">
+                  <span>🔍 Ver en grande</span>
+                </div>
+              </div>
+            }
+
+            <!-- Contenido Multimedia (Video) -->
+            @if (msg.tipoContenido === 'video' && msg.mediaUrl) {
+              <div
+                class="media-container media-video"
+                (click)="openLightbox(msg, 'video')"
+                title="Haz clic para reproducir en pantalla completa"
+              >
+                <video [src]="msg.mediaUrl" class="chat-video-preview" muted preload="metadata"></video>
+                <div class="video-play-overlay">
+                  <span class="play-icon">▶</span>
+                  <span class="play-text">Ver video</span>
+                </div>
+              </div>
+            }
+
+            <!-- Texto del Mensaje -->
+            @if (msg.mensaje) {
+              <p class="message-text">{{ msg.mensaje }}</p>
+            }
           </div>
         </div>
       }
     </div>
 
+    <!-- Pending Media Preview Strip -->
+    @if (pendingMedia()) {
+      <div class="pending-media-strip">
+        <div class="pending-thumb-wrapper">
+          @if (pendingMedia()?.tipo === 'imagen') {
+            <img [src]="pendingMedia()?.url" alt="Previsualización" class="pending-thumb" />
+          } @else {
+            <div class="pending-video-icon">🎥 Video</div>
+          }
+        </div>
+        <div class="pending-meta">
+          <span class="pending-filename">{{ pendingMedia()?.name }}</span>
+          <span class="pending-tag">Listo para enviar</span>
+        </div>
+        <button (click)="cancelPendingMedia()" class="btn-cancel-media" title="Descartar archivo">✕</button>
+      </div>
+    }
+
+    @if (uploadError()) {
+      <div class="upload-error-banner">
+        ⚠️ {{ uploadError() }}
+      </div>
+    }
+
     <!-- Footer / Input Form -->
     <div class="chatbox-footer">
       @if (authService.isAuthenticated()) {
         <form (ngSubmit)="onSendMessage()" class="chat-form">
+          <!-- Hidden Native File Input -->
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            accept="image/*,video/*"
+            style="display: none"
+          />
+
+          <!-- Attach Media Button -->
+          <button
+            type="button"
+            (click)="onAttachClick()"
+            class="btn-attach"
+            title="Adjuntar foto o video de herramienta"
+          >
+            📎
+          </button>
+
           <input
             type="text"
             [(ngModel)]="newMessage"
             name="chatInput"
-            placeholder="Escribe un mensaje a la comunidad..."
+            placeholder="Escribe un mensaje o adjunta foto/video..."
             maxlength="500"
             autocomplete="off"
-            required
           />
-          <button type="submit" class="btn-send" [disabled]="!newMessage.trim()">
+
+          <button
+            type="submit"
+            class="btn-send"
+            [disabled]="!newMessage.trim() && !pendingMedia()"
+            title="Enviar mensaje"
+          >
             <span>➤</span>
           </button>
         </form>
       } @else {
         <div class="chat-login-prompt">
-          <p>Inicia sesión para chatear en tiempo real</p>
+          <p>Inicia sesión para enviar mensajes, fotos y videos</p>
           <a routerLink="/login" (click)="toggleChat()" class="btn btn-sm btn-primary">
             Ingresar
           </a>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Pantalla Completa (Lightbox Modal) para Imágenes y Videos -->
+@if (activeLightbox()) {
+  <div class="lightbox-overlay" (click)="closeLightbox()">
+    <div class="lightbox-container" (click)="$event.stopPropagation()">
+      <!-- Lightbox Header -->
+      <div class="lightbox-header">
+        <div class="lightbox-author-info">
+          <span class="lightbox-author">👤 {{ activeLightbox()?.author }}</span>
+          @if (activeLightbox()?.time) {
+            <span class="lightbox-time">{{ activeLightbox()?.time | date:'HH:mm' }}</span>
+          }
+        </div>
+        <div class="lightbox-actions">
+          <a [href]="activeLightbox()?.url" download="tool_library_media" target="_blank" class="btn-lightbox-download" title="Descargar archivo">
+            ⬇ Descargar
+          </a>
+          <button (click)="closeLightbox()" class="btn-lightbox-close" title="Cerrar (Esc)">✕</button>
+        </div>
+      </div>
+
+      <!-- Lightbox Media Body -->
+      <div class="lightbox-body">
+        @if (activeLightbox()?.tipo === 'imagen') {
+          <img [src]="activeLightbox()?.url" alt="Visualización en pantalla grande" class="lightbox-image" />
+        }
+
+        @if (activeLightbox()?.tipo === 'video') {
+          <video [src]="activeLightbox()?.url" controls autoplay class="lightbox-video"></video>
+        }
+      </div>
+
+      <!-- Lightbox Caption Footer -->
+      @if (activeLightbox()?.caption) {
+        <div class="lightbox-caption">
+          <p>{{ activeLightbox()?.caption }}</p>
         </div>
       }
     </div>

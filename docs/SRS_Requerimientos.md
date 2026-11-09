@@ -53,3 +53,4 @@
 | **RNF06** | Reactividad Frontend | Angular Signals en modo Zoneless para detección inmediata de cambios. |
 | **RNF07** | Arquitectura MVC | Separación estricta de Modelos, Vistas y Controladores en backend. |
 | **RNF08** | Independencia Cartográfica | Mapas OpenStreetMap + Leaflet sin costos de licencias ni APIs de pago. |
+

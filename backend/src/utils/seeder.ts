@@ -351,6 +351,26 @@ export const seedDatabase = async () => {
         mensaje: 'Gracias Carlos! Ya te envié la solicitud por el taladro para armar mis repisas este fin de semana.',
         sala: 'comunidad_general',
         createdAt: new Date(hoy.getTime() - 30 * 60 * 1000)
+      },
+      {
+        usuarioId: carlos._id,
+        nombreUsuario: 'Carlos Mendoza',
+        rolUsuario: 'user',
+        tipoContenido: 'imagen',
+        mediaUrl: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1200&q=80',
+        mensaje: 'Aquí les comparto una foto del taladro con su estuche y set de brocas en perfecto estado:',
+        sala: 'comunidad_general',
+        createdAt: new Date(hoy.getTime() - 15 * 60 * 1000)
+      },
+      {
+        usuarioId: marcos._id,
+        nombreUsuario: 'Marcos Andrade',
+        rolUsuario: 'user',
+        tipoContenido: 'video',
+        mediaUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        mensaje: 'Video demostrativo probando la presión y boquilla de la hidrolavadora Kärcher:',
+        sala: 'comunidad_general',
+        createdAt: new Date(hoy.getTime() - 5 * 60 * 1000)
       }
     ]);
     console.log('[Seeder] Mensajes iniciales de WebSocket insertados.');

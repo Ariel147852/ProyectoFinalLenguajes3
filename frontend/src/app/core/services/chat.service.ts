@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
 import { Observable, Subject } from 'rxjs';
-import { ChatMessage } from '../models/chat.model';
+import { ChatMessage, ChatContentType } from '../models/chat.model';
 import { ApiResponse } from '../models/api.model';
 
 @Injectable({
@@ -50,16 +50,24 @@ export class ChatService implements OnDestroy {
     usuarioId: string;
     nombreUsuario: string;
     rolUsuario?: 'user' | 'admin';
-    mensaje: string;
+    mensaje?: string;
+    tipoContenido?: ChatContentType;
+    mediaUrl?: string;
     sala?: string;
   }): void {
-    if (!payload.mensaje.trim()) return;
+    const text = payload.mensaje?.trim() || '';
+    const media = payload.mediaUrl?.trim() || '';
+
+    // Debe contener texto o archivo multimedia
+    if (!text && !media) return;
 
     this.socket.emit('send_message', {
       usuarioId: payload.usuarioId,
       nombreUsuario: payload.nombreUsuario,
       rolUsuario: payload.rolUsuario || 'user',
-      mensaje: payload.mensaje.trim(),
+      mensaje: text,
+      tipoContenido: payload.tipoContenido || (media ? 'imagen' : 'texto'),
+      mediaUrl: media,
       sala: payload.sala || 'comunidad_general'
     });
   }

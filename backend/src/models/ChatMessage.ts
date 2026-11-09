@@ -1,11 +1,15 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
+export type ChatContentType = 'texto' | 'imagen' | 'video';
+
 export interface IChatMessage extends Document {
   _id: Types.ObjectId;
   usuarioId: Types.ObjectId;
   nombreUsuario: string;
   rolUsuario: 'user' | 'admin';
   mensaje: string;
+  tipoContenido: ChatContentType;
+  mediaUrl?: string;
   sala: string;
   createdAt: Date;
   updatedAt: Date;
@@ -30,9 +34,17 @@ const ChatMessageSchema = new Schema<IChatMessage>(
     },
     mensaje: {
       type: String,
-      required: [true, 'El mensaje no puede estar vacío'],
       trim: true,
-      maxlength: [500, 'El mensaje no puede superar 500 caracteres']
+      default: ''
+    },
+    tipoContenido: {
+      type: String,
+      enum: ['texto', 'imagen', 'video'],
+      default: 'texto'
+    },
+    mediaUrl: {
+      type: String,
+      default: ''
     },
     sala: {
       type: String,

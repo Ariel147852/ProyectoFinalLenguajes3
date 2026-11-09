@@ -1,9 +1,10 @@
 import { Server as HttpServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import { ChatMessage } from '../models/ChatMessage';
+import { ChatMessage, ChatContentType } from '../models/ChatMessage';
 
 export const initSocket = (httpServer: HttpServer): SocketIOServer => {
   const io = new SocketIOServer(httpServer, {
+    maxHttpBufferSize: 1e7, // 10MB para soportar imágenes y videos en base64/buffer
     cors: {
       origin: '*',
       methods: ['GET', 'POST']
@@ -19,18 +20,29 @@ export const initSocket = (httpServer: HttpServer): SocketIOServer => {
       console.log(`[WebSocket] Socket ${socket.id} se unió a la sala: ${sala}`);
     });
 
-    // Enviar y persistir mensaje en tiempo real
+    // Enviar y persistir mensaje con soporte de multimedia
     socket.on('send_message', async (data: {
       usuarioId: string;
       nombreUsuario: string;
       rolUsuario?: 'user' | 'admin';
-      mensaje: string;
+      mensaje?: string;
+      tipoContenido?: ChatContentType;
+      mediaUrl?: string;
       sala?: string;
     }) => {
       try {
-        const { usuarioId, nombreUsuario, rolUsuario = 'user', mensaje, sala = 'comunidad_general' } = data;
+        const {
+          usuarioId,
+          nombreUsuario,
+          rolUsuario = 'user',
+          mensaje = '',
+          tipoContenido = 'texto',
+          mediaUrl = '',
+          sala = 'comunidad_general'
+        } = data;
 
-        if (!mensaje || mensaje.trim().length === 0) {
+        // Debe haber texto o multimedia
+        if (!mensaje.trim() && !mediaUrl.trim()) {
           return;
         }
 
@@ -40,15 +52,17 @@ export const initSocket = (httpServer: HttpServer): SocketIOServer => {
           nombreUsuario,
           rolUsuario,
           mensaje: mensaje.trim(),
+          tipoContenido,
+          mediaUrl: mediaUrl.trim(),
           sala
         });
 
-        // Emitir a todos los usuarios conectados en la sala
+        // Emitir en tiempo real a todos los clientes de la sala
         io.to(sala).emit('receive_message', nuevoMensaje);
-        console.log(`[WebSocket] Mensaje de ${nombreUsuario} emitido a sala ${sala}`);
+        console.log(`[WebSocket] Mensaje (${tipoContenido}) de ${nombreUsuario} emitido a sala ${sala}`);
       } catch (error) {
         console.error('[WebSocket Error] Error al guardar/emitir mensaje:', error);
-        socket.emit('error_message', { error: 'No se pudo enviar el mensaje' });
+        socket.emit('error_message', { error: 'No se pudo enviar el mensaje o archivo multimedia' });
       }
     });
 
