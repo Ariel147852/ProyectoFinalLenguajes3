@@ -1,0 +1,456 @@
+<div class="subscription-page-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-badge">💳 Monetización y Membresías</div>
+    <h1>Planes, Suscripciones y Métodos de Pago</h1>
+    <p>
+      Accede a la biblioteca comunitaria, comparte tus herramientas con vecinos y gestiona tus comprobantes de pago.
+    </p>
+  </div>
+
+  <!-- Feedback Alert -->
+  @if (feedbackMessage()) {
+    <div
+      class="alert"
+      [class.alert-success]="feedbackType() === 'success'"
+      [class.alert-error]="feedbackType() === 'error'"
+    >
+      {{ feedbackMessage() }}
+    </div>
+  }
+
+  <!-- Status & Limits Card -->
+  @if (subStatus(); as sub) {
+    <div class="status-summary-card" [class.status-active]="sub.estadoSuscripcion === 'activa'" [class.status-expired]="sub.estadoSuscripcion !== 'activa'">
+      <div class="status-header">
+        <div class="status-title-group">
+          <span class="status-indicator-dot"></span>
+          <div>
+            <h3>
+              Estado de tu Membresía:
+              <strong class="status-text">{{ sub.estadoSuscripcion | uppercase }}</strong>
+            </h3>
+            <p class="status-sub">
+              @if (sub.esAdmin) {
+                <span>👑 Cuenta de Administrador (Publicaciones Ilimitadas y Acceso Total)</span>
+              } @else if (sub.estadoSuscripcion === 'activa') {
+                <span>Válida hasta el {{ sub.fechaFinSuscripcion | date:'longDate' }} ({{ sub.diasRestantes }} días restantes)</span>
+              } @else {
+                <span class="text-warning">⚠️ No tienes una suscripción activa. Suscríbete para poder publicar herramientas.</span>
+              }
+            </p>
+          </div>
+        </div>
+        <div class="status-action-pill">
+          @if (sub.puedePublicar) {
+            <span class="badge badge-success">✓ Habilitado para publicar</span>
+          } @else {
+            <span class="badge badge-warning">⛔ Publicación pausada</span>
+          }
+        </div>
+      </div>
+
+      <div class="limits-breakdown">
+        <div class="limit-stat-box">
+          <span class="stat-number">{{ sub.herramientasPublicadas }}</span>
+          <span class="stat-caption">Herramientas Publicadas</span>
+        </div>
+        <div class="limit-stat-divider">/</div>
+        <div class="limit-stat-box">
+          <span class="stat-number">{{ sub.esAdmin ? '∞' : sub.limiteTotal }}</span>
+          <span class="stat-caption">Límite Total Permitido</span>
+        </div>
+        <div class="limit-stat-details">
+          <div class="progress-bar-bg">
+            <div
+              class="progress-bar-fill"
+              [style.width.%]="sub.esAdmin ? 100 : (sub.herramientasPublicadas / (sub.limiteTotal || 1)) * 100"
+            ></div>
+          </div>
+          <div class="limits-legend">
+            <span>Base: <strong>{{ sub.limiteBase }}</strong> herramientas</span>
+            <span>Extras compradas: <strong>+{{ sub.herramientasExtras }}</strong></span>
+            <span>Cupos libres: <strong>{{ sub.esAdmin ? 'Ilimitados' : sub.cuposDisponibles }}</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Pricing Plans Section -->
+  <div class="plans-grid">
+    <!-- Plan Mensual Card -->
+    <div class="plan-card featured-plan">
+      <div class="plan-badge">Plan Recomendado</div>
+      <div class="plan-icon">📦</div>
+      <h2 class="plan-name">Suscripción Mensual</h2>
+      <div class="plan-price">
+        <span class="currency">$</span>
+        <span class="amount">5</span>
+        <span class="cents">.00</span>
+        <span class="period">/ mes</span>
+      </div>
+      <p class="plan-desc">La tarifa comunitaria estándar para mantener la plataforma y compartir en tu barrio.</p>
+      <ul class="plan-features">
+        <li><span>✓</span> Publica hasta <strong>5 herramientas</strong> activas</li>
+        <li><span>✓</span> Solicita y presta herramientas sin límites</li>
+        <li><span>✓</span> Acceso al chatbox comunitario en tiempo real</li>
+        <li><span>✓</span> Soporte y mediación vecinal directa</li>
+        <li><span>✓</span> Válido por 30 días continuos</li>
+      </ul>
+      <button
+        type="button"
+        (click)="tipoPago = 'suscripcion_mensual'"
+        class="btn btn-plan"
+        [class.btn-plan-selected]="tipoPago === 'suscripcion_mensual'"
+      >
+        {{ tipoPago === 'suscripcion_mensual' ? '✓ Seleccionado para Pago' : 'Elegir Suscripción ($5)' }}
+      </button>
+    </div>
+
+    <!-- Herramientas Extras Card -->
+    <div class="plan-card">
+      <div class="plan-badge badge-secondary">Para Coleccionistas</div>
+      <div class="plan-icon">⚡</div>
+      <h2 class="plan-name">Herramientas Extras</h2>
+      <div class="plan-price">
+        <span class="currency">$</span>
+        <span class="amount">0</span>
+        <span class="cents">.50</span>
+        <span class="period">/ herramienta extra</span>
+      </div>
+      <p class="plan-desc">¿Tienes más de 5 herramientas que quieras compartir con tus vecinos? Añade cupos adicionales.</p>
+      <ul class="plan-features">
+        <li><span>✓</span> Incrementa tu límite sobre las 5 base</li>
+        <li><span>✓</span> <strong>Solo $0.50 USD</strong> por cada herramienta adicional</li>
+        <li><span>✓</span> Pago único por cupo durante tu ciclo activo</li>
+        <li><span>✓</span> Flexibilidad para prestar todo tu taller</li>
+      </ul>
+      <button
+        type="button"
+        (click)="tipoPago = 'herramientas_extras'"
+        class="btn btn-plan"
+        [class.btn-plan-selected]="tipoPago === 'herramientas_extras'"
+      >
+        {{ tipoPago === 'herramientas_extras' ? '✓ Seleccionado para Pago' : 'Elegir Cupos Extras ($0.50 c/u)' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Bank Information & Payment Submission Section -->
+  <div class="payment-action-section">
+    <!-- Bank Details Card -->
+    <div class="bank-card">
+      <div class="bank-card-header">
+        <span class="bank-icon">🏦</span>
+        <div>
+          <h3>Datos para Transferencia Bancaria</h3>
+          <p>Realiza tu transferencia o depósito y sube tu comprobante a continuación:</p>
+        </div>
+      </div>
+
+      @if (bankDetails(); as b) {
+        <div class="bank-data-list">
+          <div class="bank-row">
+            <span class="row-label">Institución Financiera:</span>
+            <span class="row-value highlight-value"><strong>{{ b.banco }}</strong></span>
+          </div>
+          <div class="bank-row">
+            <span class="row-label">Tipo de Cuenta:</span>
+            <span class="row-value">{{ b.tipoCuenta }}</span>
+          </div>
+          <div class="bank-row">
+            <span class="row-label">Número de Cuenta:</span>
+            <span class="row-value mono-value"><strong>{{ b.numeroCuenta }}</strong></span>
+          </div>
+          <div class="bank-row">
+            <span class="row-label">Titular / Beneficiario:</span>
+            <span class="row-value">{{ b.titular }}</span>
+          </div>
+          <div class="bank-row">
+            <span class="row-label">RUC / Cédula:</span>
+            <span class="row-value mono-value">{{ b.identificacion }}</span>
+          </div>
+          <div class="bank-row">
+            <span class="row-label">Correo para Notificación:</span>
+            <span class="row-value">{{ b.emailNotificacion }}</span>
+          </div>
+        </div>
+
+        <button (click)="copyBankInfo()" class="btn btn-outline btn-copy-bank" type="button">
+          @if (copiedNotice()) {
+            <span>✓ ¡Datos copiados al portapapeles!</span>
+          } @else {
+            <span>📋 Copiar Datos Bancarios</span>
+          }
+        </button>
+      }
+
+      <div class="bank-instructions-note">
+        <p>
+          ℹ️ <strong>Importante:</strong> El administrador revisará tu comprobante bancario. Una vez verificado el saldo, tu suscripción o herramientas adicionales se habilitarán automáticamente.
+        </p>
+      </div>
+    </div>
+
+    <!-- Receipt Upload Form Card -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <span class="form-icon">📤</span>
+        <div>
+          <h3>Enviar Comprobante de Pago</h3>
+          <p>Sube la captura o voucher de tu transferencia para verificación.</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="onSubmitPayment()" class="payment-form">
+        <!-- Tipo de Pago Selection -->
+        <div class="form-group">
+          <label class="form-label">¿Qué estás pagando?</label>
+          <div class="payment-type-toggle">
+            <label class="radio-card" [class.radio-selected]="tipoPago === 'suscripcion_mensual'">
+              <input
+                type="radio"
+                name="tipoPago"
+                value="suscripcion_mensual"
+                [(ngModel)]="tipoPago"
+              />
+              <div class="radio-content">
+                <strong>Suscripción Mensual</strong>
+                <span>$5.00 USD (30 días, 5 herramientas)</span>
+              </div>
+            </label>
+
+            <label class="radio-card" [class.radio-selected]="tipoPago === 'herramientas_extras'">
+              <input
+                type="radio"
+                name="tipoPago"
+                value="herramientas_extras"
+                [(ngModel)]="tipoPago"
+              />
+              <div class="radio-content">
+                <strong>Herramientas Extras</strong>
+                <span>$0.50 USD por herramienta adicional</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Cantidad de extras si aplica -->
+        @if (tipoPago === 'herramientas_extras') {
+          <div class="form-group extras-selector-group">
+            <label for="cantidadExtras" class="form-label">
+              Cantidad de herramientas extras a habilitar:
+            </label>
+            <div class="extras-input-row">
+              <input
+                id="cantidadExtras"
+                type="number"
+                min="1"
+                max="20"
+                class="form-control extras-input"
+                [(ngModel)]="cantidadHerramientasExtras"
+                name="cantidadHerramientasExtras"
+              />
+              <span class="extras-calc-hint">
+                = <strong>${{ totalPagar.toFixed(2) }} USD</strong> ({{ cantidadHerramientasExtras }} x $0.50)
+              </span>
+            </div>
+          </div>
+        }
+
+        <!-- Total Box -->
+        <div class="total-summary-box">
+          <span>Total a transferir:</span>
+          <strong class="total-amount">${{ totalPagar.toFixed(2) }} USD</strong>
+        </div>
+
+        <!-- Banco de Origen -->
+        <div class="form-group">
+          <label for="bancoOrigen" class="form-label">Banco desde el que transferiste: *</label>
+          <select
+            id="bancoOrigen"
+            class="form-control"
+            [(ngModel)]="bancoOrigen"
+            name="bancoOrigen"
+            required
+          >
+            @for (banco of bancosDisponibles; track banco) {
+              <option [value]="banco">{{ banco }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Número de Comprobante -->
+        <div class="form-group">
+          <label for="numeroComprobante" class="form-label">Número de Comprobante / Secuencial / Referencia: *</label>
+          <input
+            id="numeroComprobante"
+            type="text"
+            class="form-control"
+            placeholder="Ej: 9843201 o REF-4482"
+            [(ngModel)]="numeroComprobante"
+            name="numeroComprobante"
+            required
+          />
+        </div>
+
+        <!-- Subida de Imagen Comprobante -->
+        <div class="form-group">
+          <label class="form-label">Comprobante de Pago (Voucher / Captura de Pantalla): *</label>
+          @if (!comprobanteUrl) {
+            <div class="file-drop-area">
+              <input
+                type="file"
+                id="comprobanteFileInput"
+                class="file-input-hidden"
+                accept="image/*,application/pdf"
+                (change)="onFileSelected($event)"
+              />
+              <label for="comprobanteFileInput" class="file-drop-label">
+                <span class="file-icon">📁</span>
+                <span class="file-text">Selecciona la imagen o captura de tu comprobante</span>
+                <span class="file-hint">Formatos: PNG, JPG, JPEG, WEBP (Máx. 8 MB)</span>
+              </label>
+            </div>
+          } @else {
+            <div class="file-preview-card">
+              <img [src]="comprobanteUrl" alt="Vista previa comprobante" class="receipt-thumb-preview" />
+              <div class="file-preview-info">
+                <span class="file-name">{{ comprobanteFileName || 'comprobante_transferencia.png' }}</span>
+                <button type="button" (click)="removeSelectedFile()" class="btn-remove-file">
+                  ✕ Cambiar imagen
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Notas Opcionales -->
+        <div class="form-group">
+          <label for="notas" class="form-label">Notas o mensaje adicional (opcional):</label>
+          <textarea
+            id="notas"
+            class="form-control"
+            rows="2"
+            placeholder="Ej: Transferencia hecha desde la cuenta de mi trabajo..."
+            [(ngModel)]="notas"
+            name="notas"
+          ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="btn btn-primary btn-submit-payment"
+          [disabled]="isSubmitting() || !numeroComprobante || !comprobanteUrl"
+        >
+          @if (isSubmitting()) {
+            <span>⏳ Enviando Comprobante...</span>
+          } @else {
+            <span>🚀 Enviar Comprobante para Verificación (${{ totalPagar.toFixed(2) }} USD)</span>
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- User's Payments History Section -->
+  <div class="history-section">
+    <div class="history-header">
+      <h2>Historial de Mis Pagos y Comprobantes</h2>
+      <span class="history-count">{{ myPayments().length }} pagos registrados</span>
+    </div>
+
+    @if (myPayments().length === 0) {
+      <div class="empty-history-card">
+        <p>No tienes comprobantes de pago registrados todavía.</p>
+        <span class="subtext">Cuando realices una transferencia y subas el comprobante, verás su estado de aprobación aquí.</span>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="receipts-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Concepto</th>
+              <th>Monto</th>
+              <th>Banco & Referencia</th>
+              <th>Comprobante</th>
+              <th>Estado</th>
+              <th>Observación Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pago of myPayments(); track pago._id) {
+              <tr>
+                <td>{{ pago.createdAt | date:'shortDate' }} <br><small class="text-muted">{{ pago.createdAt | date:'shortTime' }}</small></td>
+                <td>
+                  @if (pago.tipoPago === 'suscripcion_mensual') {
+                    <span class="concept-badge concept-sub">Suscripción Mensual (5 tools)</span>
+                  } @else {
+                    <span class="concept-badge concept-extra">+{{ pago.cantidadHerramientasExtras }} Herramientas Extras</span>
+                  }
+                </td>
+                <td><strong>${{ pago.monto.toFixed(2) }} USD</strong></td>
+                <td>
+                  <strong>{{ pago.bancoOrigen }}</strong><br>
+                  <span class="text-muted mono-value"># {{ pago.numeroComprobante }}</span>
+                </td>
+                <td>
+                  <button type="button" (click)="openReceiptModal(pago)" class="btn btn-sm btn-outline btn-view-receipt">
+                    🔍 Ver Voucher
+                  </button>
+                </td>
+                <td>
+                  @if (pago.estado === 'pendiente') {
+                    <span class="badge badge-warning">🟡 En Revisión</span>
+                  } @else if (pago.estado === 'aprobado') {
+                    <span class="badge badge-success">🟢 Aprobado</span>
+                  } @else {
+                    <span class="badge badge-error">🔴 Rechazado</span>
+                  }
+                </td>
+                <td>
+                  @if (pago.motivoRechazo) {
+                    <span class="text-danger small">{{ pago.motivoRechazo }}</span>
+                  } @else if (pago.estado === 'aprobado') {
+                    <span class="text-success small">Verificado por administración</span>
+                  } @else {
+                    <span class="text-muted small">Pendiente de verificación bancaria</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal para ver el comprobante en grande -->
+@if (activeReceiptModal(); as modal) {
+  <div class="receipt-modal-backdrop" (click)="closeReceiptModal()">
+    <div class="receipt-modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3>Comprobante #{{ modal.numeroComprobante }}</h3>
+          <p>{{ modal.bancoOrigen }} - ${{ modal.monto.toFixed(2) }} USD ({{ modal.createdAt | date:'medium' }})</p>
+        </div>
+        <button (click)="closeReceiptModal()" class="btn-close-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <img [src]="modal.comprobanteUrl" alt="Comprobante en detalle" class="full-receipt-image" />
+      </div>
+      <div class="modal-footer">
+        <a [href]="modal.comprobanteUrl" download="comprobante" target="_blank" class="btn btn-outline btn-sm">
+          ⬇ Descargar Comprobante
+        </a>
+        <button (click)="closeReceiptModal()" class="btn btn-primary btn-sm">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}

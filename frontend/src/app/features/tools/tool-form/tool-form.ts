@@ -1,9 +1,11 @@
-import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import * as L from 'leaflet';
 import { ToolService } from '../../../core/services/tool.service';
+import { PaymentService } from '../../../core/services/payment.service';
+import { SubscriptionStatus } from '../../../core/models/payment.model';
 
 @Component({
   selector: 'app-tool-form',
@@ -12,7 +14,7 @@ import { ToolService } from '../../../core/services/tool.service';
   templateUrl: './tool-form.html',
   styleUrls: ['./tool-form.css']
 })
-export class ToolFormComponent implements AfterViewInit, OnDestroy {
+export class ToolFormComponent implements OnInit, AfterViewInit, OnDestroy {
   nombre = '';
   descripcion = '';
   categoria = 'electricas';
@@ -27,6 +29,7 @@ export class ToolFormComponent implements AfterViewInit, OnDestroy {
 
   isLoading = false;
   errorMessage = '';
+  subStatus = signal<SubscriptionStatus | null>(null);
 
   private map: L.Map | null = null;
   private marker: L.Marker | null = null;
@@ -43,8 +46,23 @@ export class ToolFormComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private toolService: ToolService,
+    private paymentService: PaymentService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.checkSubscription();
+  }
+
+  checkSubscription(): void {
+    this.paymentService.getMiEstadoSuscripcion().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.subStatus.set(res.data);
+        }
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     this.initMap();

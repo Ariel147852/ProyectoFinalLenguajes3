@@ -11,6 +11,11 @@ export interface IUser extends Document {
   direccionZona?: string;
   reputacionPromedio: number;
   activo: boolean;
+  estadoSuscripcion: 'inactiva' | 'activa' | 'vencida';
+  fechaInicioSuscripcion?: Date;
+  fechaFinSuscripcion?: Date;
+  limiteHerramientasBase: number;
+  herramientasExtras: number;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -59,6 +64,25 @@ const UserSchema = new Schema<IUser>(
     activo: {
       type: Boolean,
       default: true
+    },
+    estadoSuscripcion: {
+      type: String,
+      enum: ['inactiva', 'activa', 'vencida'],
+      default: 'inactiva'
+    },
+    fechaInicioSuscripcion: {
+      type: Date
+    },
+    fechaFinSuscripcion: {
+      type: Date
+    },
+    limiteHerramientasBase: {
+      type: Number,
+      default: 5
+    },
+    herramientasExtras: {
+      type: Number,
+      default: 0
     }
   },
   {

@@ -17,6 +17,7 @@
 
       @if (authService.isAuthenticated()) {
         <a routerLink="/loans" routerLinkActive="active">Mis Préstamos</a>
+        <a routerLink="/subscription" routerLinkActive="active">💳 Suscripción</a>
         
         @if (authService.isAdmin()) {
           <a routerLink="/admin" routerLinkActive="active" class="admin-link">🛡️ Panel Admin</a>

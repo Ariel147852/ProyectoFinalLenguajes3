@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
 import { Tool } from '../models/Tool';
 import { Loan } from '../models/Loan';
+import { PaymentReceipt } from '../models/PaymentReceipt';
 import { ApiResponse } from '../views/apiResponse';
 
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -38,11 +39,12 @@ export const toggleUserStatus = async (req: Request, res: Response, next: NextFu
 
 export const getDashboardStats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const [totalUsers, totalTools, activeLoans, completedLoans] = await Promise.all([
+    const [totalUsers, totalTools, activeLoans, completedLoans, pendingPayments] = await Promise.all([
       User.countDocuments(),
       Tool.countDocuments({ activa: true }),
       Loan.countDocuments({ estado: { $in: ['aprobado', 'en_curso'] } }),
-      Loan.countDocuments({ estado: 'devuelto' })
+      Loan.countDocuments({ estado: 'devuelto' }),
+      PaymentReceipt.countDocuments({ estado: 'pendiente' })
     ]);
 
     ApiResponse.success({
@@ -51,7 +53,8 @@ export const getDashboardStats = async (req: Request, res: Response, next: NextF
         totalUsers,
         totalTools,
         activeLoans,
-        completedLoans
+        completedLoans,
+        pendingPayments
       }
     });
   } catch (error) {

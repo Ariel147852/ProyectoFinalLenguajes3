@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Tool, ToolCategory } from '../models/Tool';
 import { Loan } from '../models/Loan';
+import { User } from '../models/User';
 import { ApiResponse } from '../views/apiResponse';
 import { AuthenticatedRequest } from '../middlewares/authMiddleware';
 
@@ -162,6 +163,50 @@ export const createTool = async (req: AuthenticatedRequest, res: Response, next:
         message: 'Faltan campos obligatorios para registrar la herramienta'
       });
       return;
+    }
+
+    const userId = req.user?.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      ApiResponse.error({ res, statusCode: 404, message: 'Usuario no encontrado' });
+      return;
+    }
+
+    const isAdmin = user.rol === 'admin';
+
+    // Regla de Negocio: Suscripción activa ($5/mes) y límite de herramientas (5 base + $0.50 c/u extra)
+    if (!isAdmin) {
+      const now = new Date();
+      // Si la fecha de fin de suscripción expiró
+      if (user.estadoSuscripcion === 'activa' && user.fechaFinSuscripcion && user.fechaFinSuscripcion < now) {
+        user.estadoSuscripcion = 'vencida';
+        await user.save();
+      }
+
+      if (user.estadoSuscripcion !== 'activa') {
+        ApiResponse.error({
+          res,
+          statusCode: 403,
+          message: 'Se requiere una suscripción mensual activa ($5/mes) para publicar herramientas. Envía tu comprobante de pago para activar tu cuenta.'
+        });
+        return;
+      }
+
+      const herramientasPublicadas = await Tool.countDocuments({
+        propietarioId: user._id,
+        activa: true
+      });
+
+      const limiteTotal = (user.limiteHerramientasBase || 5) + (user.herramientasExtras || 0);
+
+      if (herramientasPublicadas >= limiteTotal) {
+        ApiResponse.error({
+          res,
+          statusCode: 403,
+          message: `Has alcanzado el límite de ${limiteTotal} herramientas de tu plan (5 base + ${user.herramientasExtras || 0} extras). Puedes publicar más herramientas por solo $0.50 cada una adquiriendo cupos extras.`
+        });
+        return;
+      }
     }
 
     const tool = await Tool.create({

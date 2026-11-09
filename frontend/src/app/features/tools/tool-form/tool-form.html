@@ -5,6 +5,27 @@
       <p>Comparte un equipo que tengas en casa y ayuda a tus vecinos a completar sus proyectos</p>
     </div>
 
+    @if (subStatus(); as sub) {
+      @if (!sub.puedePublicar) {
+        <div class="subscription-warning-box">
+          <div class="warning-info">
+            <span class="warning-icon">⚠️</span>
+            <div>
+              <strong>Publicación Pausada:</strong>
+              @if (sub.motivoBloqueo === 'sin_suscripcion') {
+                <p>Necesitas una suscripción mensual activa ($5.00/mes) para compartir herramientas con los vecinos.</p>
+              } @else {
+                <p>Has alcanzado el límite de tu plan ({{ sub.limiteTotal }} herramientas). Puedes publicar herramientas adicionales por $0.50 cada una.</p>
+              }
+            </div>
+          </div>
+          <a routerLink="/subscription" class="btn btn-primary btn-sm">
+            💳 Ver Métodos de Pago y Suscribirme
+          </a>
+        </div>
+      }
+    }
+
     @if (errorMessage) {
       <div class="alert alert-error">{{ errorMessage }}</div>
     }
@@ -102,7 +123,11 @@
 
       <div class="form-actions">
         <a routerLink="/catalog" class="btn btn-secondary">Cancelar</a>
-        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || (subStatus() && !subStatus()?.puedePublicar)"
+        >
           @if (isLoading) {
             <span>Publicando...</span>
           } @else {

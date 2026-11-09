@@ -3,11 +3,13 @@
     <div class="header-titles">
       <span class="admin-badge">🛡️ Panel de Supervisión y Control</span>
       <h1>Administración del Sistema</h1>
-      <p>Supervisa las métricas comunitarias, herramientas y el estado de los usuarios (RF16).</p>
+      <p>Supervisa las métricas comunitarias, herramientas, usuarios y verifica comprobantes de pago (RF16, RF17, RF18).</p>
     </div>
-    <button (click)="loadAdminData()" class="btn btn-outline btn-refresh">
-      🔄 Actualizar Métricas
-    </button>
+    <div class="header-buttons">
+      <button (click)="loadAdminData(); loadReceipts()" class="btn btn-outline btn-refresh">
+        🔄 Actualizar Todo
+      </button>
+    </div>
   </div>
 
   @if (actionMessage()) {
@@ -19,7 +21,7 @@
   <!-- Stats Grid -->
   @if (stats()) {
     <div class="stats-grid">
-      <div class="stat-card">
+      <div class="stat-card" (click)="activeTab.set('usuarios')">
         <div class="stat-icon icon-users">👥</div>
         <div class="stat-info">
           <span class="stat-value">{{ stats()?.totalUsers }}</span>
@@ -50,79 +52,333 @@
           <span class="stat-label">Préstamos Completados</span>
         </div>
       </div>
+
+      <div
+        class="stat-card stat-pending-payments"
+        [class.has-pending]="(stats()?.pendingPayments || 0) > 0"
+        (click)="activeTab.set('pagos'); loadReceipts('pendiente')"
+      >
+        <div class="stat-icon icon-payments">💳</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()?.pendingPayments || 0 }}</span>
+          <span class="stat-label">Comprobantes Pendientes</span>
+        </div>
+      </div>
     </div>
   }
 
-  <!-- Users Table Section -->
-  <div class="section-card">
-    <div class="section-card-header">
-      <h2>Miembros de la Comunidad</h2>
-      <span class="count-pill">{{ users().length }} usuarios en total</span>
-    </div>
-
-    @if (isLoading()) {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Cargando lista de usuarios...</p>
-      </div>
-    } @else {
-      <div class="table-responsive">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Zona</th>
-              <th>Reputación</th>
-              <th>Estado</th>
-              <th>Acción de Moderación</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (u of users(); track u.id || $any(u)._id) {
-              <tr>
-                <td>
-                  <div class="user-cell">
-                    <span class="avatar-sm">👤</span>
-                    <strong>{{ u.nombre }}</strong>
-                  </div>
-                </td>
-                <td>{{ u.email }}</td>
-                <td>
-                  <span class="role-tag" [class.role-admin]="u.rol === 'admin'">
-                    {{ u.rol | uppercase }}
-                  </span>
-                </td>
-                <td>📍 {{ u.direccionZona || 'N/A' }}</td>
-                <td>
-                  <span class="rating-badge">★ {{ u.reputacionPromedio || 5.0 }}</span>
-                </td>
-                <td>
-                  <span class="status-pill" [class.status-active]="u.activo !== false" [class.status-blocked]="u.activo === false">
-                    {{ u.activo !== false ? 'Activo' : 'Bloqueado' }}
-                  </span>
-                </td>
-                <td>
-                  @if (u.rol !== 'admin') {
-                    <button
-                      (click)="onToggleStatus(u)"
-                      class="btn btn-sm"
-                      [class.btn-danger]="u.activo !== false"
-                      [class.btn-outline]="u.activo === false"
-                    >
-                      {{ u.activo !== false ? 'Bloquear Acceso' : 'Reactivar Cuenta' }}
-                    </button>
-                  } @else {
-                    <span class="text-muted">Protegido</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+  <!-- Admin Navigation Tabs -->
+  <div class="admin-tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.tab-active]="activeTab() === 'usuarios'"
+      (click)="activeTab.set('usuarios')"
+    >
+      👥 Miembros de la Comunidad ({{ users().length }})
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.tab-active]="activeTab() === 'pagos'"
+      (click)="activeTab.set('pagos')"
+    >
+      💳 Verificación de Pagos y Comprobantes
+      @if ((stats()?.pendingPayments || 0) > 0) {
+        <span class="tab-badge-pending">{{ stats()?.pendingPayments }}</span>
+      }
+    </button>
   </div>
+
+  <!-- TAB 1: USERS MANAGEMENT -->
+  @if (activeTab() === 'usuarios') {
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2>Miembros de la Comunidad</h2>
+        <span class="count-pill">{{ users().length }} usuarios en total</span>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando lista de usuarios...</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Suscripción</th>
+                <th>Zona</th>
+                <th>Reputación</th>
+                <th>Estado</th>
+                <th>Acción de Moderación</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (u of users(); track u.id || $any(u)._id) {
+                <tr>
+                  <td>
+                    <div class="user-cell">
+                      <span class="avatar-sm">👤</span>
+                      <strong>{{ u.nombre }}</strong>
+                    </div>
+                  </td>
+                  <td>{{ u.email }}</td>
+                  <td>
+                    <span class="role-tag" [class.role-admin]="u.rol === 'admin'">
+                      {{ u.rol | uppercase }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (u.rol === 'admin') {
+                      <span class="badge badge-success">👑 Ilimitada</span>
+                    } @else if ($any(u).estadoSuscripcion === 'activa') {
+                      <span class="badge badge-success">🟢 Activa</span>
+                    } @else {
+                      <span class="badge badge-warning">⚪ Inactiva</span>
+                    }
+                  </td>
+                  <td>📍 {{ u.direccionZona || 'N/A' }}</td>
+                  <td>
+                    <span class="rating-badge">★ {{ u.reputacionPromedio || 5.0 }}</span>
+                  </td>
+                  <td>
+                    <span class="status-indicator" [class.status-active]="u.activo" [class.status-inactive]="!u.activo">
+                      {{ u.activo ? 'Activo' : 'Bloqueado' }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (u.rol !== 'admin') {
+                      <button
+                        (click)="onToggleStatus(u)"
+                        class="btn btn-sm"
+                        [class.btn-danger]="u.activo"
+                        [class.btn-success]="!u.activo"
+                      >
+                        {{ u.activo ? '🚫 Bloquear' : '✓ Desbloquear' }}
+                      </button>
+                    } @else {
+                      <span class="text-muted small">Protegido</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TAB 2: PAYMENTS & SUBSCRIPTIONS VERIFICATION -->
+  @if (activeTab() === 'pagos') {
+    <div class="section-card">
+      <div class="section-card-header">
+        <div>
+          <h2>Comprobantes de Transferencia Bancaria</h2>
+          <p class="section-subtitle">Revisa el comprobante enviado por los usuarios y aprueba para activar membresías o herramientas extras.</p>
+        </div>
+        <div class="filter-pills">
+          <button
+            type="button"
+            class="filter-pill"
+            [class.filter-active]="paymentFilter() === 'todos'"
+            (click)="loadReceipts('todos')"
+          >
+            Todos
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            [class.filter-active]="paymentFilter() === 'pendiente'"
+            (click)="loadReceipts('pendiente')"
+          >
+            🟡 Pendientes
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            [class.filter-active]="paymentFilter() === 'aprobado'"
+            (click)="loadReceipts('aprobado')"
+          >
+            🟢 Aprobados
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            [class.filter-active]="paymentFilter() === 'rechazado'"
+            (click)="loadReceipts('rechazado')"
+          >
+            🔴 Rechazados
+          </button>
+        </div>
+      </div>
+
+      @if (receipts().length === 0) {
+        <div class="empty-state-box">
+          <p>No hay comprobantes de pago registrados en esta categoría.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Concepto</th>
+                <th>Monto</th>
+                <th>Banco & Comprobante</th>
+                <th>Fecha Envío</th>
+                <th>Voucher</th>
+                <th>Estado</th>
+                <th>Acciones de Verificación</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of receipts(); track r._id) {
+                <tr>
+                  <td>
+                    <div class="user-cell">
+                      <span class="avatar-sm">👤</span>
+                      <div>
+                        <strong>{{ $any(r.usuarioId)?.nombre || 'Usuario' }}</strong>
+                        <div class="text-muted small">{{ $any(r.usuarioId)?.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    @if (r.tipoPago === 'suscripcion_mensual') {
+                      <span class="concept-badge concept-sub">Suscripción Mensual (5 tools)</span>
+                    } @else {
+                      <span class="concept-badge concept-extra">+{{ r.cantidadHerramientasExtras }} Herramientas Extras</span>
+                    }
+                  </td>
+                  <td>
+                    <strong class="receipt-amount">${{ r.monto.toFixed(2) }} USD</strong>
+                  </td>
+                  <td>
+                    <strong>{{ r.bancoOrigen }}</strong><br>
+                    <span class="mono-code"># {{ r.numeroComprobante }}</span>
+                  </td>
+                  <td>
+                    <span>{{ r.createdAt | date:'shortDate' }}</span><br>
+                    <span class="text-muted small">{{ r.createdAt | date:'shortTime' }}</span>
+                  </td>
+                  <td>
+                    <button type="button" (click)="openReceiptModal(r)" class="btn btn-sm btn-outline btn-thumb-wrap">
+                      <img [src]="r.comprobanteUrl" alt="Thumb" class="receipt-mini-thumb" />
+                      <span>🔍 Ver Comprobante</span>
+                    </button>
+                  </td>
+                  <td>
+                    @if (r.estado === 'pendiente') {
+                      <span class="badge badge-warning">🟡 Pendiente</span>
+                    } @else if (r.estado === 'aprobado') {
+                      <span class="badge badge-success">🟢 Aprobado</span>
+                    } @else {
+                      <span class="badge badge-error">🔴 Rechazado</span>
+                    }
+                  </td>
+                  <td>
+                    @if (r.estado === 'pendiente') {
+                      <div class="action-buttons-row">
+                        <button
+                          type="button"
+                          (click)="onApproveReceipt(r)"
+                          class="btn btn-sm btn-success"
+                          title="Aprobar pago y acreditar al usuario"
+                        >
+                          ✓ Aprobar
+                        </button>
+                        <button
+                          type="button"
+                          (click)="onOpenRejectModal(r)"
+                          class="btn btn-sm btn-danger"
+                          title="Rechazar comprobante"
+                        >
+                          ✕ Rechazar
+                        </button>
+                      </div>
+                    } @else if (r.estado === 'aprobado') {
+                      <div class="audit-info">
+                        <span class="text-success small">✓ Acreditado</span>
+                        @if (r.fechaVerificacion) {
+                          <span class="text-muted small">{{ r.fechaVerificacion | date:'shortDate' }}</span>
+                        }
+                      </div>
+                    } @else {
+                      <div class="audit-info">
+                        <span class="text-danger small">✕ {{ r.motivoRechazo || 'Rechazado' }}</span>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
 </div>
 
+<!-- Modal para ver el comprobante en grande (Lightbox) -->
+@if (activeReceiptModal(); as modal) {
+  <div class="receipt-modal-backdrop" (click)="closeReceiptModal()">
+    <div class="receipt-modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3>Comprobante #{{ modal.numeroComprobante }}</h3>
+          <p>{{ modal.bancoOrigen }} - ${{ modal.monto.toFixed(2) }} USD (Usuario: {{ $any(modal.usuarioId)?.nombre }})</p>
+        </div>
+        <button (click)="closeReceiptModal()" class="btn-close-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <img [src]="modal.comprobanteUrl" alt="Comprobante en detalle" class="full-receipt-image" />
+      </div>
+      <div class="modal-footer">
+        @if (modal.estado === 'pendiente') {
+          <button (click)="onApproveReceipt(modal); closeReceiptModal()" class="btn btn-success btn-sm">
+            ✓ Aprobar este Comprobante
+          </button>
+        }
+        <a [href]="modal.comprobanteUrl" download="comprobante" target="_blank" class="btn btn-outline btn-sm">
+          ⬇ Descargar
+        </a>
+        <button (click)="closeReceiptModal()" class="btn btn-primary btn-sm">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal para rechazar comprobante con motivo -->
+@if (rejectModalReceipt(); as rej) {
+  <div class="receipt-modal-backdrop" (click)="onCloseRejectModal()">
+    <div class="reject-modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Rechazar Comprobante #{{ rej.numeroComprobante }}</h3>
+        <button (click)="onCloseRejectModal()" class="btn-close-modal">✕</button>
+      </div>
+      <div class="reject-body">
+        <p>Por favor indica el motivo del rechazo para que el usuario conozca la razón:</p>
+        <textarea
+          class="form-control"
+          rows="3"
+          [(ngModel)]="rejectReason"
+          placeholder="Ej: El número de referencia no coincide con el estado de cuenta..."
+        ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button (click)="onCloseRejectModal()" class="btn btn-secondary btn-sm">Cancelar</button>
+        <button (click)="onConfirmReject()" class="btn btn-danger btn-sm" [disabled]="!rejectReason.trim()">
+          Confirmar Rechazo
+        </button>
+      </div>
+    </div>
+  </div>
+}

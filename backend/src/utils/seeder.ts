@@ -4,6 +4,7 @@ import { User } from '../models/User';
 import { Tool } from '../models/Tool';
 import { Loan } from '../models/Loan';
 import { ChatMessage } from '../models/ChatMessage';
+import { PaymentReceipt } from '../models/PaymentReceipt';
 import { ENV } from '../config/env';
 
 // Puntos geográficos distribuidos en diferentes barrios de la comunidad
@@ -27,14 +28,19 @@ export const seedDatabase = async () => {
       User.deleteMany({}),
       Tool.deleteMany({}),
       Loan.deleteMany({}),
-      ChatMessage.deleteMany({})
+      ChatMessage.deleteMany({}),
+      PaymentReceipt.deleteMany({})
     ]);
-    console.log('[Seeder] Colecciones users, tools, loans y chatmessages limpiadas.');
+    console.log('[Seeder] Colecciones users, tools, loans, chatmessages y paymentreceipts limpiadas.');
 
     // 2. Cifrado de contraseñas de prueba
     const salt = await bcrypt.genSalt(10);
     const adminPass = await bcrypt.hash('AdminPassword123!', salt);
     const userPass = await bcrypt.hash('UserPassword123!', salt);
+
+    const now = new Date();
+    const suscripcionInicio = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+    const suscripcionFin = new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000);
 
     // 3. Crear Usuarios de la Comunidad
     const admin = await User.create({
@@ -43,7 +49,9 @@ export const seedDatabase = async () => {
       passwordHash: adminPass,
       rol: 'admin',
       telefono: '0991112233',
-      direccionZona: ubicacionesBarrios[1].zona
+      direccionZona: ubicacionesBarrios[1].zona,
+      estadoSuscripcion: 'activa',
+      limiteHerramientasBase: 9999
     });
 
     const carlos = await User.create({
@@ -53,7 +61,12 @@ export const seedDatabase = async () => {
       rol: 'user',
       telefono: '0984445566',
       direccionZona: ubicacionesBarrios[0].zona,
-      reputacionPromedio: 4.9
+      reputacionPromedio: 4.9,
+      estadoSuscripcion: 'activa',
+      fechaInicioSuscripcion: suscripcionInicio,
+      fechaFinSuscripcion: suscripcionFin,
+      limiteHerramientasBase: 5,
+      herramientasExtras: 2 // Carlos tiene cupo para 7 herramientas
     });
 
     const lucia = await User.create({
@@ -63,7 +76,12 @@ export const seedDatabase = async () => {
       rol: 'user',
       telefono: '0977778899',
       direccionZona: ubicacionesBarrios[1].zona,
-      reputacionPromedio: 5.0
+      reputacionPromedio: 5.0,
+      estadoSuscripcion: 'activa',
+      fechaInicioSuscripcion: suscripcionInicio,
+      fechaFinSuscripcion: suscripcionFin,
+      limiteHerramientasBase: 5,
+      herramientasExtras: 0
     });
 
     const marcos = await User.create({
@@ -73,7 +91,10 @@ export const seedDatabase = async () => {
       rol: 'user',
       telefono: '0963334455',
       direccionZona: ubicacionesBarrios[3].zona,
-      reputacionPromedio: 4.8
+      reputacionPromedio: 4.8,
+      estadoSuscripcion: 'inactiva',
+      limiteHerramientasBase: 5,
+      herramientasExtras: 0
     });
 
     const elena = await User.create({
@@ -374,6 +395,54 @@ export const seedDatabase = async () => {
       }
     ]);
     console.log('[Seeder] Mensajes iniciales de WebSocket insertados.');
+
+    // 7. Comprobantes de Pago Iniciales (Suscripciones y Cupos Extras)
+    await PaymentReceipt.create([
+      {
+        usuarioId: carlos._id,
+        tipoPago: 'suscripcion_mensual',
+        monto: 5.0,
+        cantidadHerramientasExtras: 0,
+        metodoPago: 'transferencia_bancaria',
+        bancoOrigen: 'Banco Pichincha',
+        numeroComprobante: 'PICH-8492019',
+        comprobanteUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
+        estado: 'aprobado',
+        verificadoPor: admin._id,
+        fechaVerificacion: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
+        notas: 'Transferencia verificada en cuenta bancaria. 30 días de suscripción otorgados.',
+        createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000)
+      },
+      {
+        usuarioId: carlos._id,
+        tipoPago: 'herramientas_extras',
+        monto: 1.0,
+        cantidadHerramientasExtras: 2,
+        metodoPago: 'transferencia_bancaria',
+        bancoOrigen: 'Banco Guayaquil',
+        numeroComprobante: 'GUAY-3391082',
+        comprobanteUrl: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
+        estado: 'aprobado',
+        verificadoPor: admin._id,
+        fechaVerificacion: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+        notas: 'Pago de 2 cupos extras de herramientas aprobado ($0.50 c/u).',
+        createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
+      },
+      {
+        usuarioId: marcos._id,
+        tipoPago: 'suscripcion_mensual',
+        monto: 5.0,
+        cantidadHerramientasExtras: 0,
+        metodoPago: 'transferencia_bancaria',
+        bancoOrigen: 'Produbanco',
+        numeroComprobante: 'PROD-7719234',
+        comprobanteUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
+        estado: 'pendiente',
+        notas: 'Transferencia realizada desde app móvil Produbanco por $5.00 para suscripción de este mes.',
+        createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000)
+      }
+    ]);
+    console.log('[Seeder] Comprobantes de pago iniciales creados (1 pendiente para revisión de admin).');
 
     console.log('[Seeder] ¡Semillero completado con éxito!');
     process.exit(0);

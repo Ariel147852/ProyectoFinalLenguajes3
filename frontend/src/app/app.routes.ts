@@ -8,6 +8,7 @@ import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { LoanDashboardComponent } from './features/loans/loan-dashboard/loan-dashboard';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
+import { SubscriptionComponent } from './features/subscription/subscription';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'map', component: MapViewComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'subscription', component: SubscriptionComponent, canActivate: [authGuard] },
   { path: 'tools/new', component: ToolFormComponent, canActivate: [authGuard] },
   { path: 'tools/:id', component: ToolDetailComponent },
   { path: 'loans', component: LoanDashboardComponent, canActivate: [authGuard] },

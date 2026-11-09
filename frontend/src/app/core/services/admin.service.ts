@@ -9,6 +9,7 @@ export interface AdminStats {
   totalTools: number;
   activeLoans: number;
   completedLoans: number;
+  pendingPayments?: number;
 }
 
 @Injectable({
