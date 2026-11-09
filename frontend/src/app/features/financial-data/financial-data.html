@@ -1,0 +1,146 @@
+<div class="financial-page-container">
+  <div class="financial-header">
+    <div class="header-badge">💳 Configuración de Pagos Comunitarios</div>
+    <h1>Mis Datos Financieros y Código QR DeUna</h1>
+    <p>
+      Configura tu información bancaria y tu Código QR DeUna para que los vecinos que soliciten tus herramientas puedan realizar transferencias y pagos de forma inmediata.
+    </p>
+  </div>
+
+  @if (feedbackMessage()) {
+    <div
+      class="alert"
+      [class.alert-success]="feedbackType() === 'success'"
+      [class.alert-error]="feedbackType() === 'error'"
+    >
+      {{ feedbackMessage() }}
+    </div>
+  }
+
+  <div class="financial-layout">
+    <!-- Form Card -->
+    <div class="financial-form-card">
+      <div class="card-header">
+        <span class="header-icon">🏦</span>
+        <div>
+          <h3>Cuenta Bancaria para Transferencias</h3>
+          <p>Datos donde recibirás depósitos o transferencias interbancarias</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="financial-form">
+        <div class="form-group">
+          <label for="banco">Institución Financiera / Banco *</label>
+          <select id="banco" class="form-control" [(ngModel)]="banco" name="banco">
+            @for (b of bancosDisponibles; track b) {
+              <option [value]="b">{{ b }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="tipoCuenta">Tipo de Cuenta *</label>
+            <select id="tipoCuenta" class="form-control" [(ngModel)]="tipoCuenta" name="tipoCuenta">
+              <option value="Cuenta de Ahorros">Cuenta de Ahorros</option>
+              <option value="Cuenta Corriente">Cuenta Corriente</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="numeroCuenta">Número de Cuenta</label>
+            <input
+              type="text"
+              id="numeroCuenta"
+              class="form-control mono"
+              [(ngModel)]="numeroCuenta"
+              name="numeroCuenta"
+              placeholder="Ej: 2204598124"
+            />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="titular">Nombre del Titular *</label>
+            <input
+              type="text"
+              id="titular"
+              class="form-control"
+              [(ngModel)]="titular"
+              name="titular"
+              placeholder="Nombre y Apellido"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="telefonoDeUna">Teléfono celular DeUna *</label>
+            <input
+              type="tel"
+              id="telefonoDeUna"
+              class="form-control mono"
+              [(ngModel)]="telefonoDeUna"
+              name="telefonoDeUna"
+              placeholder="Ej: 0984445566"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-save" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <span>Guardando Cambios...</span>
+          } @else {
+            <span>💾 Guardar Datos Financieros</span>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- QR DeUna Card -->
+    <div class="qr-upload-card">
+      <div class="card-header">
+        <span class="header-icon">📲</span>
+        <div>
+          <h3>Código QR DeUna</h3>
+          <p>Facilita cobros al instante escaneando desde la app DeUna</p>
+        </div>
+      </div>
+
+      <div class="qr-body">
+        @if (qrDeUnaUrl) {
+          <div class="qr-preview-wrapper">
+            <img [src]="qrDeUnaUrl" alt="Código QR DeUna" class="qr-image-display" />
+            <div class="qr-status-pill">✓ Código QR DeUna Activo</div>
+            <button type="button" (click)="removeQr()" class="btn btn-outline btn-sm btn-change-qr">
+              ✕ Cambiar Código QR
+            </button>
+          </div>
+        } @else {
+          <div class="qr-empty-dropzone">
+            <input
+              type="file"
+              id="qrFileInput"
+              class="file-input-hidden"
+              accept="image/*"
+              (change)="onQrSelected($event)"
+            />
+            <label for="qrFileInput" class="qr-dropzone-label">
+              <span class="qr-big-icon">🔳</span>
+              <span class="qr-drop-title">Subir Imagen de tu QR DeUna</span>
+              <span class="qr-drop-hint">Descarga tu QR desde la app DeUna y súbelo aquí (PNG o JPG)</span>
+              <span class="btn btn-sm btn-outline mt-2">Seleccionar Imagen</span>
+            </label>
+          </div>
+        }
+
+        <div class="deuna-info-banner">
+          <span class="deuna-brand-tag">⚡ DeUna Ecuador</span>
+          <p>
+            Al tener tu QR DeUna configurado, cada vez que un vecino te pida una herramienta, el sistema le mostrará tu QR con un <strong>reloj de 15 minutos</strong> para que realice el pago y suba su comprobante.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

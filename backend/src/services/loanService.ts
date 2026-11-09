@@ -87,4 +87,27 @@ export class LoanService {
 
     return { valid: true, inicio, fin };
   }
+
+  /**
+   * Cancela automáticamente cualquier solicitud pendiente cuyo tiempo de 15 minutos haya expirado,
+   * liberando la herramienta para otros usuarios.
+   */
+  static async cancelarPrestamosExpirados(): Promise<number> {
+    const ahora = new Date();
+    const result = await Loan.updateMany(
+      {
+        estado: 'pendiente',
+        estadoPago: 'pendiente_pago',
+        fechaLimitePago: { $lt: ahora }
+      },
+      {
+        $set: {
+          estado: 'cancelado',
+          estadoPago: 'rechazado',
+          notasPropietario: 'Cancelado automáticamente por expiración del reloj de pago (15 minutos).'
+        }
+      }
+    );
+    return result.modifiedCount;
+  }
 }

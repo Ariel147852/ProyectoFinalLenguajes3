@@ -5,6 +5,7 @@ import { User } from '../models/User';
 import { ENV } from '../config/env';
 import { ApiResponse } from '../views/apiResponse';
 import { AuthenticatedRequest } from '../middlewares/authMiddleware';
+import { validarCedulaEcuatoriana } from '../utils/cedulaValidator';
 
 const generateToken = (id: string, email: string, rol: string): string => {
   return jwt.sign({ id, email, rol }, ENV.JWT_SECRET, {
@@ -14,13 +15,43 @@ const generateToken = (id: string, email: string, rol: string): string => {
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { nombre, email, password, telefono, direccionZona } = req.body;
+    const {
+      nombre,
+      email,
+      password,
+      telefono,
+      direccionZona,
+      cedula,
+      cedulaFrontalUrl,
+      cedulaPosteriorUrl
+    } = req.body;
 
-    if (!nombre || !email || !password) {
+    if (!nombre || !email || !password || !telefono || !cedula) {
       ApiResponse.error({
         res,
         statusCode: 400,
-        message: 'Nombre, email y contraseña son obligatorios'
+        message: 'Nombre, email, contraseña, teléfono y cédula son obligatorios'
+      });
+      return;
+    }
+
+    // Validación de Cédula Ecuatoriana (Módulo 10)
+    const validacionCedula = validarCedulaEcuatoriana(cedula);
+    if (!validacionCedula.valida) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: validacionCedula.mensaje || 'Cédula ecuatoriana no válida'
+      });
+      return;
+    }
+
+    // Comprobar fotos de cédula de ambos lados
+    if (!cedulaFrontalUrl || !cedulaPosteriorUrl) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'Es obligatorio subir la foto de la cédula de ambos lados (frontal y posterior)'
       });
       return;
     }
@@ -35,23 +66,45 @@ export const register = async (req: Request, res: Response, next: NextFunction):
       return;
     }
 
+    const existingCedula = await User.findOne({ cedula: cedula.trim() });
+    if (existingCedula) {
+      ApiResponse.error({
+        res,
+        statusCode: 409,
+        message: 'La cédula de identidad ya se encuentra registrada en el sistema'
+      });
+      return;
+    }
+
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
     const user = await User.create({
-      nombre,
-      email,
+      nombre: nombre.trim(),
+      email: email.trim().toLowerCase(),
       passwordHash,
-      telefono,
-      direccionZona: direccionZona || 'Comunidad Central',
-      rol: 'user'
+      telefono: telefono.trim(),
+      direccionZona: direccionZona ? direccionZona.trim() : 'Comunidad Central',
+      cedula: cedula.trim(),
+      cedulaFrontalUrl: cedulaFrontalUrl.trim(),
+      cedulaPosteriorUrl: cedulaPosteriorUrl.trim(),
+      cedulaVerificada: true,
+      rol: 'user',
+      datosFinancieros: {
+        banco: 'Banco Pichincha',
+        tipoCuenta: 'Cuenta de Ahorros',
+        numeroCuenta: '',
+        titular: nombre.trim(),
+        telefonoDeUna: telefono.trim(),
+        qrDeUnaUrl: ''
+      }
     });
 
     const token = generateToken(user._id.toString(), user.email, user.rol);
 
     ApiResponse.created({
       res,
-      message: 'Usuario registrado exitosamente',
+      message: 'Usuario registrado exitosamente con identidad verificada',
       data: {
         token,
         user: {
@@ -59,9 +112,11 @@ export const register = async (req: Request, res: Response, next: NextFunction):
           nombre: user.nombre,
           email: user.email,
           rol: user.rol,
+          cedula: user.cedula,
           telefono: user.telefono,
           direccionZona: user.direccionZona,
-          reputacionPromedio: user.reputacionPromedio
+          reputacionPromedio: user.reputacionPromedio,
+          datosFinancieros: user.datosFinancieros
         }
       }
     });
@@ -141,11 +196,69 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response, next:
         nombre: user.nombre,
         email: user.email,
         rol: user.rol,
+        cedula: user.cedula,
         telefono: user.telefono,
         direccionZona: user.direccionZona,
         reputacionPromedio: user.reputacionPromedio,
+        datosFinancieros: user.datosFinancieros,
         createdAt: user.createdAt
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDatosFinancieros = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const user = await User.findById(req.user?.id);
+    if (!user) {
+      ApiResponse.error({ res, statusCode: 404, message: 'Usuario no encontrado' });
+      return;
+    }
+
+    ApiResponse.success({
+      res,
+      message: 'Datos financieros obtenidos',
+      data: user.datosFinancieros || {
+        banco: 'Banco Pichincha',
+        tipoCuenta: 'Cuenta de Ahorros',
+        numeroCuenta: '',
+        titular: user.nombre,
+        telefonoDeUna: user.telefono || '',
+        qrDeUnaUrl: ''
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateDatosFinancieros = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const user = await User.findById(req.user?.id);
+    if (!user) {
+      ApiResponse.error({ res, statusCode: 404, message: 'Usuario no encontrado' });
+      return;
+    }
+
+    const { banco, tipoCuenta, numeroCuenta, titular, telefonoDeUna, qrDeUnaUrl } = req.body;
+
+    user.datosFinancieros = {
+      banco: banco ? banco.trim() : 'Banco Pichincha',
+      tipoCuenta: tipoCuenta ? tipoCuenta.trim() : 'Cuenta de Ahorros',
+      numeroCuenta: numeroCuenta ? numeroCuenta.trim() : '',
+      titular: titular ? titular.trim() : user.nombre,
+      telefonoDeUna: telefonoDeUna ? telefonoDeUna.trim() : user.telefono || '',
+      qrDeUnaUrl: qrDeUnaUrl ? qrDeUnaUrl.trim() : (user.datosFinancieros?.qrDeUnaUrl || '')
+    };
+
+    await user.save();
+
+    ApiResponse.success({
+      res,
+      message: 'Datos financieros y Código QR DeUna actualizados exitosamente',
+      data: user.datosFinancieros
     });
   } catch (error) {
     next(error);

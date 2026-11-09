@@ -5,7 +5,9 @@ import {
   deliverLoan,
   returnLoan,
   getMyBorrowerLoans,
-  getMyLenderLoans
+  getMyLenderLoans,
+  subirComprobantePago,
+  validarPagoPrestamo
 } from '../controllers/loanController';
 import { authenticateJWT } from '../middlewares/authMiddleware';
 
@@ -20,6 +22,8 @@ router.patch('/:id/deliver', deliverLoan);
 router.patch('/:id/return', returnLoan);
 router.get('/my-borrowed', getMyBorrowerLoans);
 router.get('/my-lent', getMyLenderLoans);
+router.post('/:id/comprobante-pago', subirComprobantePago);
+router.patch('/:id/validar-pago', validarPagoPrestamo);
 
 export default router;
 

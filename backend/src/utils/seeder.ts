@@ -48,10 +48,22 @@ export const seedDatabase = async () => {
       email: 'admin@toollibrary.org',
       passwordHash: adminPass,
       rol: 'admin',
+      cedula: '1710034065',
+      cedulaFrontalUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
+      cedulaPosteriorUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
+      cedulaVerificada: true,
       telefono: '0991112233',
       direccionZona: ubicacionesBarrios[1].zona,
       estadoSuscripcion: 'activa',
-      limiteHerramientasBase: 9999
+      limiteHerramientasBase: 9999,
+      datosFinancieros: {
+        banco: 'Banco Pichincha',
+        tipoCuenta: 'Cuenta Corriente',
+        numeroCuenta: '2205849301',
+        titular: 'Administrador General - ToolLibrary',
+        telefonoDeUna: '0991112233',
+        qrDeUnaUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DEUNA_PAGO_ADMIN_BIBLIOTECA'
+      }
     });
 
     const carlos = await User.create({
@@ -59,6 +71,10 @@ export const seedDatabase = async () => {
       email: 'carlos@vecino.org',
       passwordHash: userPass,
       rol: 'user',
+      cedula: '1718845629',
+      cedulaFrontalUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
+      cedulaPosteriorUrl: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
+      cedulaVerificada: true,
       telefono: '0984445566',
       direccionZona: ubicacionesBarrios[0].zona,
       reputacionPromedio: 4.9,
@@ -66,7 +82,15 @@ export const seedDatabase = async () => {
       fechaInicioSuscripcion: suscripcionInicio,
       fechaFinSuscripcion: suscripcionFin,
       limiteHerramientasBase: 5,
-      herramientasExtras: 2 // Carlos tiene cupo para 7 herramientas
+      herramientasExtras: 2, // Carlos tiene cupo para 7 herramientas
+      datosFinancieros: {
+        banco: 'Banco Pichincha',
+        tipoCuenta: 'Cuenta de Ahorros',
+        numeroCuenta: '2204598124',
+        titular: 'Carlos Mendoza',
+        telefonoDeUna: '0984445566',
+        qrDeUnaUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DEUNA_PAGO_CARLOS_MENDOZA'
+      }
     });
 
     const lucia = await User.create({
@@ -74,6 +98,10 @@ export const seedDatabase = async () => {
       email: 'lucia@vecina.org',
       passwordHash: userPass,
       rol: 'user',
+      cedula: '0915234710',
+      cedulaFrontalUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
+      cedulaPosteriorUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
+      cedulaVerificada: true,
       telefono: '0977778899',
       direccionZona: ubicacionesBarrios[1].zona,
       reputacionPromedio: 5.0,
@@ -81,7 +109,15 @@ export const seedDatabase = async () => {
       fechaInicioSuscripcion: suscripcionInicio,
       fechaFinSuscripcion: suscripcionFin,
       limiteHerramientasBase: 5,
-      herramientasExtras: 0
+      herramientasExtras: 0,
+      datosFinancieros: {
+        banco: 'Banco Guayaquil',
+        tipoCuenta: 'Cuenta de Ahorros',
+        numeroCuenta: '1109483721',
+        titular: 'Lucía Benítez',
+        telefonoDeUna: '0977778899',
+        qrDeUnaUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DEUNA_PAGO_LUCIA_BENITEZ'
+      }
     });
 
     const marcos = await User.create({
@@ -89,12 +125,24 @@ export const seedDatabase = async () => {
       email: 'marcos@vecino.org',
       passwordHash: userPass,
       rol: 'user',
+      cedula: '1710034065',
+      cedulaFrontalUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
+      cedulaPosteriorUrl: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
+      cedulaVerificada: true,
       telefono: '0963334455',
       direccionZona: ubicacionesBarrios[3].zona,
       reputacionPromedio: 4.8,
       estadoSuscripcion: 'inactiva',
       limiteHerramientasBase: 5,
-      herramientasExtras: 0
+      herramientasExtras: 0,
+      datosFinancieros: {
+        banco: 'Produbanco',
+        tipoCuenta: 'Cuenta de Ahorros',
+        numeroCuenta: '1205938472',
+        titular: 'Marcos Andrade',
+        telefonoDeUna: '0963334455',
+        qrDeUnaUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DEUNA_PAGO_MARCOS_ANDRADE'
+      }
     });
 
     const elena = await User.create({
@@ -320,7 +368,7 @@ export const seedDatabase = async () => {
       notasPropietario: 'Con mucho gusto, incluye brocas para concreto.'
     });
 
-    // Préstamo 2: Pendiente (Carlos le pide la Hidrolavadora a Marcos)
+    // Préstamo 2: Pendiente de Pago con Reloj de 15 minutos (Carlos le pide la Hidrolavadora a Marcos)
     await Loan.create({
       herramientaId: createdTools[5]._id,
       solicitanteId: carlos._id,
@@ -328,10 +376,28 @@ export const seedDatabase = async () => {
       fechaInicio: new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000),
       fechaFin: new Date(hoy.getTime() + 9 * 24 * 60 * 60 * 1000),
       estado: 'pendiente',
+      estadoPago: 'pendiente_pago',
+      fechaLimitePago: new Date(Date.now() + 14 * 60 * 1000), // Reloj de 14 minutos activos
       notasSolicitante: 'Para lavar el patio posterior durante el fin de semana.'
     });
 
-    // Préstamo 3: Devuelto / Finalizado (Elena devolvió la Escalera a Lucía)
+    // Préstamo 3: Comprobante DeUna subido, pendiente de validación por el prestador (Marcos le pide el Rotomartillo a Carlos)
+    await Loan.create({
+      herramientaId: createdTools[1]._id,
+      solicitanteId: marcos._id,
+      propietarioId: carlos._id,
+      fechaInicio: new Date(hoy.getTime() + 3 * 24 * 60 * 60 * 1000),
+      fechaFin: new Date(hoy.getTime() + 6 * 24 * 60 * 60 * 1000),
+      estado: 'pendiente',
+      estadoPago: 'pendiente_validacion',
+      metodoPago: 'deuna',
+      comprobantePagoUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
+      numeroReferenciaPago: 'DEUNA-984210',
+      fechaPagoSubido: new Date(Date.now() - 5 * 60 * 1000),
+      notasSolicitante: 'Pago realizado vía Código QR DeUna por garantía de retiro.'
+    });
+
+    // Préstamo 4: Devuelto / Finalizado (Elena devolvió la Escalera a Lucía)
     await Loan.create({
       herramientaId: createdTools[9]._id,
       solicitanteId: elena._id,

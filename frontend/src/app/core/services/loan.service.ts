@@ -40,5 +40,27 @@ export class LoanService {
   getMyLentLoans(): Observable<ApiResponse<Loan[]>> {
     return this.http.get<ApiResponse<Loan[]>>(`${this.API_URL}/my-lent`);
   }
+
+  subirComprobantePago(
+    loanId: string,
+    payload: {
+      comprobantePagoUrl: string;
+      metodoPago: 'deuna' | 'transferencia';
+      numeroReferenciaPago?: string;
+    }
+  ): Observable<ApiResponse<Loan>> {
+    return this.http.post<ApiResponse<Loan>>(`${this.API_URL}/${loanId}/comprobante-pago`, payload);
+  }
+
+  validarPago(
+    loanId: string,
+    accion: 'validar' | 'rechazar',
+    motivoRechazo?: string
+  ): Observable<ApiResponse<Loan>> {
+    return this.http.patch<ApiResponse<Loan>>(`${this.API_URL}/${loanId}/validar-pago`, {
+      accion,
+      motivoRechazo
+    });
+  }
 }
 

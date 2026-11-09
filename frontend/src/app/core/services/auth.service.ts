@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { ApiResponse } from '../models/api.model';
-import { User, AuthResponse } from '../models/user.model';
+import { User, AuthResponse, DatosFinancieros } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +27,16 @@ export class AuthService {
     }
   }
 
-  register(payload: { nombre: string; email: string; password: string; telefono?: string; direccionZona?: string }): Observable<ApiResponse<AuthResponse>> {
+  register(payload: {
+    nombre: string;
+    email: string;
+    password: string;
+    telefono: string;
+    direccionZona?: string;
+    cedula: string;
+    cedulaFrontalUrl: string;
+    cedulaPosteriorUrl: string;
+  }): Observable<ApiResponse<AuthResponse>> {
     return this.http.post<ApiResponse<AuthResponse>>(`${this.API_URL}/register`, payload).pipe(
       tap(res => {
         if (res.success && res.data) {
@@ -42,6 +51,24 @@ export class AuthService {
       tap(res => {
         if (res.success && res.data) {
           this.setSession(res.data.token, res.data.user);
+        }
+      })
+    );
+  }
+
+  getDatosFinancieros(): Observable<ApiResponse<DatosFinancieros>> {
+    return this.http.get<ApiResponse<DatosFinancieros>>(`${this.API_URL}/datos-financieros`);
+  }
+
+  updateDatosFinancieros(payload: DatosFinancieros): Observable<ApiResponse<DatosFinancieros>> {
+    return this.http.put<ApiResponse<DatosFinancieros>>(`${this.API_URL}/datos-financieros`, payload).pipe(
+      tap(res => {
+        if (res.success && res.data) {
+          const user = this.currentUser();
+          if (user) {
+            const updated = { ...user, datosFinancieros: res.data };
+            this.setSession(this.getToken() || '', updated);
+          }
         }
       })
     );

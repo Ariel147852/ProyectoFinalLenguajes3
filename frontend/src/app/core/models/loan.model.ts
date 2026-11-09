@@ -9,6 +9,12 @@ export type LoanStatus =
   | 'devuelto'
   | 'cancelado';
 
+export type LoanPaymentStatus =
+  | 'pendiente_pago'
+  | 'pendiente_validacion'
+  | 'validado'
+  | 'rechazado';
+
 export interface Loan {
   _id: string;
   herramientaId: Tool | string;
@@ -17,6 +23,13 @@ export interface Loan {
   fechaInicio: string;
   fechaFin: string;
   estado: LoanStatus;
+  estadoPago?: LoanPaymentStatus;
+  fechaLimitePago?: string;
+  comprobantePagoUrl?: string;
+  metodoPago?: 'deuna' | 'transferencia';
+  numeroReferenciaPago?: string;
+  fechaPagoSubido?: string;
+  fechaPagoValidado?: string;
   fechaEntregaReal?: string;
   fechaDevolucionReal?: string;
   notasSolicitante?: string;

@@ -16,6 +16,8 @@
 * **RN06 (Comunicación en Tiempo Real):** Todo mensaje emitido al chat comunitario se transmite instantáneamente por WebSocket y se almacena persistentemente en MongoDB para consulta histórica.
 * **RN07 (Membresías y Límites de Publicación):** La publicación de herramientas requiere una suscripción mensual activa ($5.00 USD / 30 días) que incluye hasta 5 herramientas publicadas. Para publicar herramientas adicionales sobre dicho cupo, el usuario debe adquirir cupos extras por un valor unitario de $0.50 USD.
 * **RN08 (Verificación de Transferencias Bancarias):** Todo pago de suscripción o herramientas extras se procesa mediante transferencia bancaria y permanece en estado `pendiente` hasta que un Administrador valida el comprobante en su panel y acredita el beneficio al usuario.
+* **RN09 (Identidad Fidedigna con Cédula Módulo 10 y Fotografías de Dos Lados):** El registro comunitario exige una cédula de identidad ecuatoriana válida calculada mediante el algoritmo oficial Módulo 10 y la carga de imágenes nítidas de ambos lados (frontal y posterior).
+* **RN10 (Ventana de Pago de 15 Minutos y Liberación de Herramientas):** Toda solicitud de préstamo provisional dispone de un reloj de cuenta regresiva estricto de 15 minutos (`fechaLimitePago`). Si el solicitante no adjunta el comprobante (DeUna o transferencia) antes de que el reloj llegue a 00:00, la reserva se cancela de forma automática y la herramienta se libera inmediatamente.
 
 ---
 
@@ -43,6 +45,9 @@
 | **RF18** | **Soporte Multimedia y Visor Lightbox en Chat** | Usuario | Envío de imágenes y videos en el chatbox con apertura en pantalla completa (Lightbox), descarga y reproducción de video. |
 | **RF19** | **Planes de Suscripción y Cuotas Extras ($5 / $0.50)** | Usuario | Membresía mensual ($5/mes por 5 herramientas) y compra de herramientas extras ($0.50 c/u) con monitoreo visual de cupos y días restantes. |
 | **RF20** | **Comprobantes Bancarios y Verificación por Admin** | Usuario / Admin | Envío de comprobantes de transferencia con captura/voucher bancario, y módulo administrativo para aprobar (acreditación automática) o rechazar con motivo. |
+| **RF21** | **Registro con Cédula Verificada y Fotos de 2 Lados** | Visitante | Verificación algorítmica de cédula ecuatoriana (Módulo 10) con feedback en tiempo real y subida obligatoria de fotografías de ambos lados (frontal y posterior). |
+| **RF22** | **Gestión de Datos Financieros y Código QR DeUna** | Usuario | Módulo en Navbar para configurar cuenta bancaria y subir la imagen del Código QR personal de DeUna para cobros instantáneos. |
+| **RF23** | **Reloj de Pago de 15 Minutos y Validación por Prestador** | Prestatario / Prestador | Temporizador en vivo de 15 minutos para que el prestatario pague mediante el QR DeUna del dueño y suba el voucher; si expira se libera el producto. El prestador revisa el comprobante y valida el préstamo. |
 
 ---
 

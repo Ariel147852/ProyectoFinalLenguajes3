@@ -1,7 +1,8 @@
 <div class="loans-page-container">
   <div class="loans-header">
-    <h1>Gestión de Préstamos Comunitarios</h1>
-    <p>Administra las herramientas que solicitaste y los pedidos que recibiste como dueño</p>
+    <div class="header-badge">🔄 Gestión y Trazabilidad</div>
+    <h1>Préstamos Comunitarios y Pagos</h1>
+    <p>Administra los pedidos de tus herramientas y gestiona los pagos con reloj de 15 minutos y código QR DeUna</p>
   </div>
 
   <div class="tabs-nav">
@@ -10,14 +11,14 @@
       [class.active]="activeTab() === 'borrowed'"
       (click)="switchTab('borrowed')"
     >
-      📥 Mis Solicitudes de Préstamo
+      📥 Mis Solicitudes de Préstamo (Prestatario)
     </button>
     <button
       class="tab-btn"
       [class.active]="activeTab() === 'lent'"
       (click)="switchTab('lent')"
     >
-      📤 Préstamos de mis Herramientas
+      📤 Préstamos de mis Herramientas (Prestamista)
     </button>
   </div>
 
@@ -33,12 +34,12 @@
       <p>Cargando información de préstamos...</p>
     </div>
   } @else {
-    <!-- Tab 1: Borrowed by me -->
+    <!-- TAB 1: MIS SOLICITUDES (SOY PRESTATARIO) -->
     @if (activeTab() === 'borrowed') {
       @if (borrowedLoans().length === 0) {
         <div class="empty-state">
           <p>Aún no has solicitado ningún préstamo de herramientas.</p>
-          <a routerLink="/catalog" class="btn btn-primary">Ir al Catálogo</a>
+          <a routerLink="/catalog" class="btn btn-primary">Ir al Catálogo de Herramientas</a>
         </div>
       } @else {
         <div class="loans-table-wrapper">
@@ -46,24 +47,30 @@
             <thead>
               <tr>
                 <th>Herramienta</th>
-                <th>Propietario</th>
-                <th>Fechas</th>
-                <th>Estado</th>
-                <th>Mensaje</th>
+                <th>Prestamista (Dueño)</th>
+                <th>Fechas Reservadas</th>
+                <th>Estado del Préstamo</th>
+                <th>Pago & Reloj 15 min</th>
+                <th>Acción de Pago</th>
               </tr>
             </thead>
             <tbody>
               @for (loan of borrowedLoans(); track loan._id) {
-                <tr>
+                @let time = getTimeRemaining(loan);
+                <tr [class.row-expired]="loan.estado === 'pendiente' && loan.estadoPago === 'pendiente_pago' && time.expired">
                   <td>
-                    <strong>{{ $any(loan.herramientaId)?.nombre || 'Herramienta' }}</strong>
+                    <div class="tool-cell">
+                      <span class="tool-icon">🛠️</span>
+                      <strong>{{ $any(loan.herramientaId)?.nombre || 'Herramienta' }}</strong>
+                    </div>
                   </td>
                   <td>
-                    {{ $any(loan.propietarioId)?.nombre }}
-                    <small class="block text-muted">{{ $any(loan.propietarioId)?.telefono }}</small>
+                    <strong>{{ $any(loan.propietarioId)?.nombre }}</strong>
+                    <small class="block text-muted">📞 {{ $any(loan.propietarioId)?.telefono }}</small>
                   </td>
                   <td>
-                    {{ loan.fechaInicio | date:'dd/MM/yyyy' }} al {{ loan.fechaFin | date:'dd/MM/yyyy' }}
+                    <span class="date-badge">{{ loan.fechaInicio | date:'dd/MM/yyyy' }}</span> al 
+                    <span class="date-badge">{{ loan.fechaFin | date:'dd/MM/yyyy' }}</span>
                   </td>
                   <td>
                     <span class="status-badge" [class]="loan.estado">
@@ -71,7 +78,60 @@
                     </span>
                   </td>
                   <td>
-                    <span class="note-text">{{ loan.notasSolicitante || 'Sin notas' }}</span>
+                    <!-- Flujo de pago y Reloj de 15 Minutos -->
+                    @if (loan.estado === 'pendiente') {
+                      @if (loan.estadoPago === 'pendiente_pago') {
+                        @if (!time.expired) {
+                          <div class="timer-badge active-timer">
+                            <span class="timer-icon">⏳</span>
+                            <div class="timer-content">
+                              <span class="timer-text">Pagar en: <strong>{{ time.text }}</strong></span>
+                              <div class="timer-bar-bg">
+                                <div class="timer-bar-fill" [style.width.%]="time.percent"></div>
+                              </div>
+                            </div>
+                          </div>
+                        } @else {
+                          <div class="timer-badge expired-timer">
+                            <span>⌛ Tiempo agotado (15 min)</span>
+                            <small class="block">Herramienta liberada</small>
+                          </div>
+                        }
+                      } @else if (loan.estadoPago === 'pendiente_validacion') {
+                        <span class="badge badge-warning">🟡 Comprobante subido (En revisión)</span>
+                      } @else if (loan.estadoPago === 'validado') {
+                        <span class="badge badge-success">🟢 Pago Validado</span>
+                      }
+                    } @else if (loan.estado === 'aprobado' || loan.estado === 'en_curso') {
+                      <span class="badge badge-success">🟢 Pago Confirmado</span>
+                    } @else if (loan.estado === 'cancelado') {
+                      <span class="badge badge-error">❌ Cancelado / Expirado</span>
+                    } @else {
+                      <span class="badge badge-secondary">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (loan.estado === 'pendiente' && loan.estadoPago === 'pendiente_pago' && !time.expired) {
+                      <button
+                        type="button"
+                        (click)="openPaymentModal(loan)"
+                        class="btn btn-sm btn-primary btn-pay-action"
+                      >
+                        📲 Pagar con QR DeUna / Cargar Voucher
+                      </button>
+                    } @else if (loan.comprobantePagoUrl) {
+                      <button
+                        type="button"
+                        (click)="openVoucherModal(loan.comprobantePagoUrl, 'Comprobante de Pago', 'Herramienta: ' + $any(loan.herramientaId)?.nombre)"
+                        class="btn btn-sm btn-outline"
+                      >
+                        🔍 Ver Mi Comprobante
+                      </button>
+                    } @else if (loan.estado === 'cancelado') {
+                      <span class="text-muted small">Plazo de pago vencido</span>
+                    } @else {
+                      <span class="text-muted small">Completado</span>
+                    }
                   </td>
                 </tr>
               }
@@ -81,7 +141,7 @@
       }
     }
 
-    <!-- Tab 2: Lent by me (I am the owner) -->
+    <!-- TAB 2: PRÉSTAMOS DE MIS HERRAMIENTAS (SOY PRESTADOR / PROPIETARIO) -->
     @if (activeTab() === 'lent') {
       @if (lentLoans().length === 0) {
         <div class="empty-state">
@@ -93,10 +153,10 @@
             <thead>
               <tr>
                 <th>Herramienta</th>
-                <th>Solicitante</th>
+                <th>Prestatario (Solicitante)</th>
                 <th>Fechas</th>
-                <th>Estado</th>
-                <th>Acciones del Propietario</th>
+                <th>Comprobante de Pago</th>
+                <th>Acciones del Prestador</th>
               </tr>
             </thead>
             <tbody>
@@ -106,48 +166,80 @@
                     <strong>{{ $any(loan.herramientaId)?.nombre || 'Herramienta' }}</strong>
                   </td>
                   <td>
-                    {{ $any(loan.solicitanteId)?.nombre }}
-                    <small class="block text-muted">Tel: {{ $any(loan.solicitanteId)?.telefono || 'N/A' }}</small>
+                    <strong>{{ $any(loan.solicitanteId)?.nombre }}</strong>
+                    <div class="text-muted small">📞 {{ $any(loan.solicitanteId)?.telefono }}</div>
+                    @if ($any(loan.solicitanteId)?.cedula) {
+                      <div class="text-muted small">🪪 CI: {{ $any(loan.solicitanteId)?.cedula }}</div>
+                    }
                   </td>
                   <td>
                     {{ loan.fechaInicio | date:'dd/MM/yyyy' }} al {{ loan.fechaFin | date:'dd/MM/yyyy' }}
                   </td>
                   <td>
-                    <span class="status-badge" [class]="loan.estado">
-                      {{ loan.estado | uppercase }}
-                    </span>
+                    <!-- Verificación de Pago para el Prestador -->
+                    @if (loan.estadoPago === 'pendiente_validacion') {
+                      <div class="pending-validation-wrap">
+                        <span class="badge badge-warning">🟡 Pago Pendiente de Validación</span>
+                        @if (loan.comprobantePagoUrl) {
+                          <button
+                            type="button"
+                            (click)="openVoucherModal(loan.comprobantePagoUrl, 'Comprobante del Solicitante', 'Pagado por: ' + $any(loan.solicitanteId)?.nombre)"
+                            class="btn btn-sm btn-outline mt-1"
+                          >
+                            🔍 Ver Voucher Subido
+                          </button>
+                        }
+                      </div>
+                    } @else if (loan.estadoPago === 'validado') {
+                      <span class="badge badge-success">🟢 Pago Validado</span>
+                    } @else if (loan.estadoPago === 'pendiente_pago') {
+                      <span class="badge badge-secondary">⏳ En espera de pago (15 min)</span>
+                    } @else {
+                      <span class="status-badge" [class]="loan.estado">{{ loan.estado | uppercase }}</span>
+                    }
                   </td>
                   <td>
-                    <div class="action-buttons">
-                      @if (loan.estado === 'pendiente') {
-                        <button (click)="onRespond(loan._id, 'aprobar')" class="btn btn-sm btn-primary">
-                          Aprobar
-                        </button>
-                        <button (click)="onRespond(loan._id, 'rechazar')" class="btn btn-sm btn-danger">
-                          Rechazar
-                        </button>
+                    <!-- Acciones según estado -->
+                    @if (loan.estado === 'pendiente') {
+                      @if (loan.estadoPago === 'pendiente_validacion') {
+                        <div class="btn-group-actions">
+                          <button
+                            type="button"
+                            (click)="onValidarPago(loan._id, 'validar')"
+                            class="btn btn-sm btn-success"
+                            title="Validar comprobante y aprobar préstamo"
+                          >
+                            ✓ Validar Pago y Aprobar
+                          </button>
+                          <button
+                            type="button"
+                            (click)="onValidarPago(loan._id, 'rechazar')"
+                            class="btn btn-sm btn-danger"
+                            title="Rechazar pago"
+                          >
+                            ✕ Rechazar
+                          </button>
+                        </div>
+                      } @else {
+                        <span class="text-muted small">Esperando que el solicitante pague y suba su voucher</span>
                       }
+                    }
 
-                      @if (loan.estado === 'aprobado') {
-                        <button (click)="onDeliver(loan._id)" class="btn btn-sm btn-outline">
-                          Registrar Entrega
-                        </button>
-                      }
+                    @if (loan.estado === 'aprobado') {
+                      <button (click)="onDeliver(loan._id)" class="btn btn-sm btn-primary">
+                        📦 Registrar Entrega / Retiro
+                      </button>
+                    }
 
-                      @if (loan.estado === 'en_curso') {
-                        <button (click)="onReturn(loan._id)" class="btn btn-sm btn-primary">
-                          Registrar Devolución
-                        </button>
-                      }
+                    @if (loan.estado === 'en_curso') {
+                      <button (click)="onReturn(loan._id)" class="btn btn-sm btn-success">
+                        ✅ Confirmar Devolución
+                      </button>
+                    }
 
-                      @if (loan.estado === 'devuelto') {
-                        <span class="completed-label">✅ Finalizado</span>
-                      }
-
-                      @if (loan.estado === 'rechazado') {
-                        <span class="text-muted">Rechazado</span>
-                      }
-                    </div>
+                    @if (loan.estado === 'devuelto') {
+                      <span class="text-muted small">✓ Préstamo Concluido</span>
+                    }
                   </td>
                 </tr>
               }
@@ -158,3 +250,180 @@
     }
   }
 </div>
+
+<!-- MODAL: PRESTATARIO PAGA Y SUBE COMPROBANTE -->
+@if (activePaymentModal(); as activeLoan) {
+  <div class="modal-backdrop" (click)="closePaymentModal()">
+    <div class="modal-dialog payment-modal-wide" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3>Realizar Pago y Cargar Comprobante</h3>
+          <p>Herramienta: <strong>{{ $any(activeLoan.herramientaId)?.nombre }}</strong></p>
+        </div>
+        <button (click)="closePaymentModal()" class="btn-close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Reloj de 15 Minutos en el Modal -->
+        @let t = getTimeRemaining(activeLoan);
+        <div class="modal-timer-banner" [class.banner-urgent]="t.percent < 30">
+          <span class="timer-big-icon">⏱️</span>
+          <div>
+            <strong>Tiempo restante para subir tu comprobante: {{ t.text }}</strong>
+            <p>Si el reloj llega a cero sin cargar el comprobante, el préstamo se cancelará automáticamente y la herramienta será liberada.</p>
+          </div>
+        </div>
+
+        <!-- Datos del Prestador (QR DeUna y Cuenta) -->
+        <div class="owner-payment-details-card">
+          <h4>Datos de Cobro del Prestador ({{ $any(activeLoan.propietarioId)?.nombre }})</h4>
+          
+          <div class="owner-payment-grid">
+            <!-- Columna QR DeUna -->
+            <div class="qr-col">
+              @if ($any(activeLoan.propietarioId)?.datosFinancieros?.qrDeUnaUrl) {
+                <div class="qr-box">
+                  <img
+                    [src]="$any(activeLoan.propietarioId)?.datosFinancieros?.qrDeUnaUrl"
+                    alt="Código QR DeUna del Prestador"
+                    class="deuna-qr-img"
+                  />
+                  <span class="qr-label">📲 Escanea con DeUna</span>
+                </div>
+              } @else {
+                <div class="qr-placeholder">
+                  <span>📱 DeUna: <strong>{{ $any(activeLoan.propietarioId)?.telefono }}</strong></span>
+                  <small>Transfiere directamente por número celular a través de DeUna</small>
+                </div>
+              }
+            </div>
+
+            <!-- Columna Cuenta Bancaria -->
+            <div class="bank-col">
+              <div class="bank-row">
+                <span>Banco:</span>
+                <strong>{{ $any(activeLoan.propietarioId)?.datosFinancieros?.banco || 'Banco Pichincha' }}</strong>
+              </div>
+              <div class="bank-row">
+                <span>Tipo:</span>
+                <span>{{ $any(activeLoan.propietarioId)?.datosFinancieros?.tipoCuenta || 'Ahorros' }}</span>
+              </div>
+              <div class="bank-row">
+                <span>Número de Cuenta:</span>
+                <strong class="mono">{{ $any(activeLoan.propietarioId)?.datosFinancieros?.numeroCuenta || 'Por coordinar' }}</strong>
+              </div>
+              <div class="bank-row">
+                <span>Beneficiario:</span>
+                <span>{{ $any(activeLoan.propietarioId)?.datosFinancieros?.titular || $any(activeLoan.propietarioId)?.nombre }}</span>
+              </div>
+              <div class="bank-row">
+                <span>Celular DeUna:</span>
+                <strong class="mono">{{ $any(activeLoan.propietarioId)?.datosFinancieros?.telefonoDeUna || $any(activeLoan.propietarioId)?.telefono }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulario de Subida de Comprobante -->
+        <form (ngSubmit)="onSubmitReceipt()" class="receipt-upload-form">
+          <div class="form-group">
+            <label>Método de Pago Utilizado *</label>
+            <div class="method-toggles">
+              <label class="toggle-option" [class.selected]="metodoPago === 'deuna'">
+                <input type="radio" name="metodoPago" value="deuna" [(ngModel)]="metodoPago" />
+                <span>📲 Código QR DeUna</span>
+              </label>
+              <label class="toggle-option" [class.selected]="metodoPago === 'transferencia'">
+                <input type="radio" name="metodoPago" value="transferencia" [(ngModel)]="metodoPago" />
+                <span>🏦 Transferencia Bancaria</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="numeroReferencia">Número de Referencia / Secuencial / Comprobante</label>
+            <input
+              type="text"
+              id="numeroReferencia"
+              class="form-control"
+              placeholder="Ej: DEUNA-982341 o REF-448201"
+              [(ngModel)]="numeroReferencia"
+              name="numeroReferencia"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Captura del Comprobante de Pago (Voucher) *</label>
+            @if (!comprobantePagoUrl) {
+              <div class="dropzone-box">
+                <input
+                  type="file"
+                  id="receiptInput"
+                  class="file-input-hidden"
+                  accept="image/*"
+                  (change)="onReceiptFileSelected($event)"
+                />
+                <label for="receiptInput" class="dropzone-label">
+                  <span class="drop-icon">📷</span>
+                  <span class="drop-text">Selecciona la captura de tu transferencia o pago DeUna</span>
+                  <span class="drop-hint">Formatos: PNG, JPG (Máximo 8 MB)</span>
+                </label>
+              </div>
+            } @else {
+              <div class="preview-receipt-card">
+                <img [src]="comprobantePagoUrl" alt="Comprobante de pago" class="thumb-receipt" />
+                <div class="preview-meta">
+                  <span>✓ {{ comprobanteFileName || 'comprobante_pago.png' }}</span>
+                  <button type="button" (click)="comprobantePagoUrl = ''; comprobanteFileName = ''" class="btn-change">
+                    ✕ Cambiar comprobante
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" (click)="closePaymentModal()" class="btn btn-secondary">Cancelar</button>
+            <button
+              type="submit"
+              class="btn btn-primary btn-submit-voucher"
+              [disabled]="isUploadingReceipt() || !comprobantePagoUrl || t.expired"
+            >
+              @if (isUploadingReceipt()) {
+                <span>Enviando Comprobante...</span>
+              } @else {
+                <span>🚀 Confirmar y Cargar Comprobante</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MODAL LIGHTBOX PARA VER COMPROBANTE -->
+@if (activeVoucherModal(); as v) {
+  <div class="modal-backdrop" (click)="closeVoucherModal()">
+    <div class="voucher-lightbox-container" (click)="$event.stopPropagation()">
+      <div class="lightbox-header">
+        <div>
+          <h3>{{ v.title }}</h3>
+          @if (v.meta) {
+            <p>{{ v.meta }}</p>
+          }
+        </div>
+        <button (click)="closeVoucherModal()" class="btn-close">✕</button>
+      </div>
+      <div class="lightbox-img-wrap">
+        <img [src]="v.url" alt="Comprobante en detalle" class="lightbox-img" />
+      </div>
+      <div class="lightbox-footer">
+        <a [href]="v.url" download="comprobante_pago" target="_blank" class="btn btn-outline btn-sm">
+          ⬇ Descargar Voucher
+        </a>
+        <button (click)="closeVoucherModal()" class="btn btn-primary btn-sm">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}

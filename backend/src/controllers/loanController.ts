@@ -64,6 +64,8 @@ export const requestLoan = async (req: AuthenticatedRequest, res: Response, next
       return;
     }
 
+    const fechaLimitePago = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos exactos
+
     const loan = await Loan.create({
       herramientaId: tool._id,
       solicitanteId,
@@ -71,12 +73,14 @@ export const requestLoan = async (req: AuthenticatedRequest, res: Response, next
       fechaInicio: inicio,
       fechaFin: fin,
       notasSolicitante: notasSolicitante || '',
-      estado: 'pendiente'
+      estado: 'pendiente',
+      estadoPago: 'pendiente_pago',
+      fechaLimitePago
     });
 
     const populatedLoan = await Loan.findById(loan._id)
       .populate('herramientaId', 'nombre categoria imagenes')
-      .populate('propietarioId', 'nombre email telefono');
+      .populate('propietarioId', 'nombre email telefono datosFinancieros');
 
     ApiResponse.created({
       res,
@@ -232,9 +236,12 @@ export const returnLoan = async (req: AuthenticatedRequest, res: Response, next:
 
 export const getMyBorrowerLoans = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
+    // Cancelar automáticamente solicitudes expiradas de más de 15 minutos
+    await LoanService.cancelarPrestamosExpirados();
+
     const loans = await Loan.find({ solicitanteId: req.user?.id })
       .populate('herramientaId', 'nombre categoria imagenes direccionZona')
-      .populate('propietarioId', 'nombre email telefono')
+      .populate('propietarioId', 'nombre email telefono datosFinancieros')
       .sort({ createdAt: -1 });
 
     ApiResponse.success({ res, data: loans });
@@ -245,12 +252,120 @@ export const getMyBorrowerLoans = async (req: AuthenticatedRequest, res: Respons
 
 export const getMyLenderLoans = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
+    // Cancelar automáticamente solicitudes expiradas de más de 15 minutos
+    await LoanService.cancelarPrestamosExpirados();
+
     const loans = await Loan.find({ propietarioId: req.user?.id })
       .populate('herramientaId', 'nombre categoria imagenes')
-      .populate('solicitanteId', 'nombre email telefono reputacionPromedio')
+      .populate('solicitanteId', 'nombre email telefono reputacionPromedio cedula')
       .sort({ createdAt: -1 });
 
     ApiResponse.success({ res, data: loans });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const subirComprobantePago = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { comprobantePagoUrl, metodoPago, numeroReferenciaPago } = req.body;
+    const userId = req.user?.id;
+
+    if (!comprobantePagoUrl) {
+      ApiResponse.error({ res, statusCode: 400, message: 'La imagen del comprobante de pago es obligatoria' });
+      return;
+    }
+
+    const loan = await Loan.findById(id);
+    if (!loan) {
+      ApiResponse.error({ res, statusCode: 404, message: 'Préstamo no encontrado' });
+      return;
+    }
+
+    if (loan.solicitanteId.toString() !== userId) {
+      ApiResponse.error({ res, statusCode: 403, message: 'Solo el solicitante del préstamo puede subir el comprobante de pago' });
+      return;
+    }
+
+    if (loan.estado !== 'pendiente') {
+      ApiResponse.error({ res, statusCode: 400, message: `El préstamo no está pendiente de pago (estado actual: ${loan.estado})` });
+      return;
+    }
+
+    // Comprobar si el reloj de 15 minutos expiró
+    const ahora = new Date();
+    if (loan.fechaLimitePago && loan.fechaLimitePago < ahora) {
+      loan.estado = 'cancelado';
+      loan.estadoPago = 'rechazado';
+      await loan.save();
+
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'El tiempo límite de 15 minutos para realizar el pago ha expirado. El producto ha sido liberado.'
+      });
+      return;
+    }
+
+    loan.comprobantePagoUrl = comprobantePagoUrl.trim();
+    loan.metodoPago = metodoPago === 'transferencia' ? 'transferencia' : 'deuna';
+    loan.numeroReferenciaPago = numeroReferenciaPago ? numeroReferenciaPago.trim() : '';
+    loan.fechaPagoSubido = ahora;
+    loan.estadoPago = 'pendiente_validacion';
+    await loan.save();
+
+    ApiResponse.success({
+      res,
+      message: 'Comprobante de pago subido exitosamente. En espera de que el propietario valide el pago.',
+      data: loan
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const validarPagoPrestamo = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { accion, motivoRechazo } = req.body; // 'validar' | 'rechazar'
+    const userId = req.user?.id;
+
+    if (!['validar', 'rechazar'].includes(accion)) {
+      ApiResponse.error({ res, statusCode: 400, message: 'La acción debe ser "validar" o "rechazar"' });
+      return;
+    }
+
+    const loan = await Loan.findById(id);
+    if (!loan) {
+      ApiResponse.error({ res, statusCode: 404, message: 'Préstamo no encontrado' });
+      return;
+    }
+
+    if (loan.propietarioId.toString() !== userId) {
+      ApiResponse.error({ res, statusCode: 403, message: 'Solo el propietario de la herramienta puede validar el pago' });
+      return;
+    }
+
+    if (accion === 'validar') {
+      loan.estadoPago = 'validado';
+      loan.estado = 'aprobado';
+      loan.fechaPagoValidado = new Date();
+    } else {
+      loan.estadoPago = 'rechazado';
+      loan.estado = 'rechazado';
+      if (motivoRechazo) {
+        loan.notasPropietario = motivoRechazo.trim();
+      }
+    }
+
+    await loan.save();
+
+    ApiResponse.success({
+      res,
+      message: accion === 'validar' ? 'Pago validado exitosamente. Préstamo confirmado.' : 'Pago rechazado. Herramienta liberada.',
+      data: loan
+    });
   } catch (error) {
     next(error);
   }

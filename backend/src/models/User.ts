@@ -1,16 +1,30 @@
 import { Schema, model, Document, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+export interface IDatosFinancieros {
+  banco?: string;
+  tipoCuenta?: string;
+  numeroCuenta?: string;
+  titular?: string;
+  telefonoDeUna?: string;
+  qrDeUnaUrl?: string;
+}
+
 export interface IUser extends Document {
   _id: Types.ObjectId;
   nombre: string;
   email: string;
   passwordHash: string;
   rol: 'user' | 'admin';
+  cedula?: string;
+  cedulaFrontalUrl?: string;
+  cedulaPosteriorUrl?: string;
+  cedulaVerificada: boolean;
   telefono?: string;
   direccionZona?: string;
   reputacionPromedio: number;
   activo: boolean;
+  datosFinancieros?: IDatosFinancieros;
   estadoSuscripcion: 'inactiva' | 'activa' | 'vencida';
   fechaInicioSuscripcion?: Date;
   fechaFinSuscripcion?: Date;
@@ -46,6 +60,23 @@ const UserSchema = new Schema<IUser>(
       enum: ['user', 'admin'],
       default: 'user'
     },
+    cedula: {
+      type: String,
+      trim: true,
+      sparse: true
+    },
+    cedulaFrontalUrl: {
+      type: String,
+      default: ''
+    },
+    cedulaPosteriorUrl: {
+      type: String,
+      default: ''
+    },
+    cedulaVerificada: {
+      type: Boolean,
+      default: true
+    },
     telefono: {
       type: String,
       trim: true
@@ -54,6 +85,14 @@ const UserSchema = new Schema<IUser>(
       type: String,
       trim: true,
       default: 'Comunidad Central'
+    },
+    datosFinancieros: {
+      banco: { type: String, default: 'Banco Pichincha' },
+      tipoCuenta: { type: String, default: 'Cuenta de Ahorros' },
+      numeroCuenta: { type: String, default: '' },
+      titular: { type: String, default: '' },
+      telefonoDeUna: { type: String, default: '' },
+      qrDeUnaUrl: { type: String, default: '' }
     },
     reputacionPromedio: {
       type: Number,

@@ -8,6 +8,12 @@ export type LoanStatus =
   | 'devuelto'
   | 'cancelado';
 
+export type LoanPaymentStatus =
+  | 'pendiente_pago'
+  | 'pendiente_validacion'
+  | 'validado'
+  | 'rechazado';
+
 export interface ILoan extends Document {
   _id: Types.ObjectId;
   herramientaId: Types.ObjectId;
@@ -16,6 +22,13 @@ export interface ILoan extends Document {
   fechaInicio: Date;
   fechaFin: Date;
   estado: LoanStatus;
+  estadoPago: LoanPaymentStatus;
+  fechaLimitePago?: Date;
+  comprobantePagoUrl?: string;
+  metodoPago?: 'deuna' | 'transferencia';
+  numeroReferenciaPago?: string;
+  fechaPagoSubido?: Date;
+  fechaPagoValidado?: Date;
   fechaEntregaReal?: Date;
   fechaDevolucionReal?: Date;
   notasSolicitante?: string;
@@ -56,6 +69,36 @@ const LoanSchema = new Schema<ILoan>(
         message: '{VALUE} no es un estado válido de préstamo'
       },
       default: 'pendiente'
+    },
+    estadoPago: {
+      type: String,
+      enum: {
+        values: ['pendiente_pago', 'pendiente_validacion', 'validado', 'rechazado'],
+        message: '{VALUE} no es un estado de pago válido'
+      },
+      default: 'pendiente_pago'
+    },
+    fechaLimitePago: {
+      type: Date
+    },
+    comprobantePagoUrl: {
+      type: String,
+      default: ''
+    },
+    metodoPago: {
+      type: String,
+      enum: ['deuna', 'transferencia'],
+      default: 'deuna'
+    },
+    numeroReferenciaPago: {
+      type: String,
+      default: ''
+    },
+    fechaPagoSubido: {
+      type: Date
+    },
+    fechaPagoValidado: {
+      type: Date
     },
     fechaEntregaReal: {
       type: Date
