@@ -1,63 +1,85 @@
 .home-container {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem;
+  padding: 3rem 1.75rem;
 }
 
-/* Hero Section */
+/* ================================================================
+   HERO SECTION
+   ================================================================ */
 .hero-section {
   text-align: center;
-  padding: 4.5rem 1.5rem;
-  background: radial-gradient(circle at 50% 0%, #fffbeb 0%, #fef3c7 40%, #ffffff 100%);
-  border-radius: var(--radius-lg, 1rem);
-  margin-bottom: 2rem;
-  border: 1px solid rgba(217, 119, 6, 0.15);
-  box-shadow: 0 10px 30px -10px rgba(217, 119, 6, 0.08);
+  padding: 5rem 2rem;
+  background: radial-gradient(circle at 50% 0%, #fffbeb 0%, #fef3c7 35%, #ffffff 85%);
+  border-radius: var(--radius-xl, 1.6rem);
+  margin-bottom: 2.5rem;
+  border: 1.5px solid rgba(245, 158, 11, 0.2);
+  box-shadow: 0 20px 40px -15px rgba(217, 119, 6, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .hero-badge-wrap {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .badge {
-  display: inline-block;
-  padding: 0.35rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
   border-radius: 9999px;
   font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .badge-eco {
-  background-color: var(--eco-light, #d1fae5);
-  color: var(--eco-dark, #065f46);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
 }
 
 .badge-tag {
-  background-color: #f1f5f9;
+  background-color: #ffffff;
   color: #475569;
   border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-xs);
 }
 
 .hero-title {
-  font-size: 2.9rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 3.25rem;
   color: #0f172a;
   line-height: 1.15;
-  margin-bottom: 1.25rem;
-  max-width: 900px;
+  margin-bottom: 1.35rem;
+  max-width: 920px;
   margin-left: auto;
   margin-right: auto;
   font-weight: 800;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.035em;
 }
 
 .title-highlight {
   display: block;
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -65,37 +87,34 @@
 .hero-description {
   font-size: 1.15rem;
   color: #475569;
-  max-width: 700px;
-  margin: 0 auto 2.25rem;
-  line-height: 1.6;
+  max-width: 720px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.65;
+  font-weight: 500;
 }
 
 .hero-actions {
   display: flex;
-  gap: 1rem;
+  gap: 1.15rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 
-.btn-lg {
-  padding: 0.85rem 1.85rem;
-  font-size: 1.05rem;
-  border-radius: 0.65rem;
-}
-
-/* Impact Metrics Strip */
+/* ================================================================
+   METRICS BAR
+   ================================================================ */
 .metrics-bar {
   background: white;
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 0.85rem;
-  padding: 1.5rem 2rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: var(--radius-lg, 1.15rem);
+  padding: 1.75rem 2.5rem;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  margin-bottom: 4rem;
-  box-shadow: var(--shadow-md);
+  margin-bottom: 4.5rem;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 1.75rem;
 }
 
 .metric-item {
@@ -106,9 +125,12 @@
 }
 
 .metric-number {
-  font-size: 2rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 2.35rem;
   font-weight: 800;
-  color: var(--primary, #d97706);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   line-height: 1.1;
 }
 
@@ -116,95 +138,103 @@
   font-size: 0.85rem;
   color: #64748b;
   font-weight: 600;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
 }
 
 .metric-divider {
   width: 1px;
-  height: 40px;
-  background-color: var(--border-color, #e2e8f0);
+  height: 44px;
+  background: #e2e8f0;
 }
 
 @media (max-width: 768px) {
   .metric-divider { display: none; }
-  .metrics-bar { gap: 1rem; }
-  .hero-title { font-size: 2.2rem; }
+  .metrics-bar { gap: 1.25rem; }
+  .hero-title { font-size: 2.35rem; }
 }
 
-/* Section Titles */
+/* ================================================================
+   SECTIONS & TITLES
+   ================================================================ */
 .section-title-wrap {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.75rem;
 }
 
 .sub-heading {
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   color: var(--primary, #d97706);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.45rem;
 }
 
 .section-title {
-  font-size: 2rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 2.25rem;
   color: #0f172a;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
-/* Steps Section */
+/* ================================================================
+   STEPS SECTION
+   ================================================================ */
 .steps-section {
-  margin-bottom: 4.5rem;
+  margin-bottom: 5rem;
 }
 
 .steps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 2rem;
 }
 
 .step-card {
   background: white;
-  padding: 2.25rem 2rem;
-  border-radius: var(--radius-lg, 1rem);
+  padding: 2.5rem 2rem;
+  border-radius: var(--radius-lg, 1.15rem);
   border: 1px solid var(--border-color, #e2e8f0);
   text-align: center;
   box-shadow: var(--shadow-sm);
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .step-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(217, 119, 6, 0.4);
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08);
+  border-color: rgba(217, 119, 6, 0.45);
 }
 
 .step-number {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  width: 32px;
-  height: 32px;
-  background: var(--primary-light, #fef3c7);
+  top: 18px;
+  left: 18px;
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   color: var(--primary-hover, #b45309);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1rem;
   font-weight: 800;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.15);
 }
 
 .step-icon {
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   margin: 0.5rem auto 1rem;
 }
 
 .step-card h3 {
-  font-size: 1.25rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1.3rem;
   color: #0f172a;
   margin-bottom: 0.75rem;
   font-weight: 700;
@@ -216,52 +246,57 @@
   line-height: 1.6;
 }
 
-/* Categories Section */
+/* ================================================================
+   CATEGORIES SECTION
+   ================================================================ */
 .categories-section {
-  margin-bottom: 4.5rem;
+  margin-bottom: 5rem;
 }
 
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.75rem;
 }
 
 .category-card {
   background: white;
-  padding: 1.75rem;
-  border-radius: var(--radius-lg, 1rem);
+  padding: 2rem;
+  border-radius: var(--radius-lg, 1.15rem);
   border: 1px solid var(--border-color, #e2e8f0);
   text-decoration: none;
   color: inherit;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-xs);
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08);
   border-color: var(--primary, #d97706);
 }
 
 .category-icon-box {
-  width: 48px;
-  height: 48px;
-  background: var(--primary-light, #fef3c7);
-  border-radius: 0.75rem;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: var(--radius-md, 0.75rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 10px rgba(217, 119, 6, 0.15);
 }
 
 .category-icon {
-  font-size: 1.6rem;
+  font-size: 1.75rem;
 }
 
 .category-card h3 {
-  font-size: 1.2rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1.25rem;
   color: #0f172a;
   margin-bottom: 0.5rem;
   font-weight: 700;
@@ -269,37 +304,59 @@
 
 .category-card p {
   color: #64748b;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  line-height: 1.55;
   flex: 1;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .category-link {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--primary, #d97706);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
-/* CTA Banner */
+/* ================================================================
+   CTA BANNER
+   ================================================================ */
 .cta-banner {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
   color: white;
-  padding: 3.5rem 2rem;
-  border-radius: var(--radius-lg, 1rem);
+  padding: 4rem 2.5rem;
+  border-radius: var(--radius-xl, 1.6rem);
   text-align: center;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-banner::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 20%;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .cta-content h2 {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 2.25rem;
+  margin-bottom: 0.85rem;
   font-weight: 800;
+  color: #ffffff;
 }
 
 .cta-content p {
   color: #cbd5e1;
-  font-size: 1.1rem;
-  max-width: 650px;
-  margin: 0 auto 2rem;
+  font-size: 1.15rem;
+  max-width: 680px;
+  margin: 0 auto 2.25rem;
+  line-height: 1.6;
 }

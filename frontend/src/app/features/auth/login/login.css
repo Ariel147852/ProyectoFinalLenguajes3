@@ -22,7 +22,10 @@
 }
 
 .auth-header h2 {
-  font-size: 1.6rem;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
   color: #0f172a;
   margin-bottom: 0.5rem;
 }

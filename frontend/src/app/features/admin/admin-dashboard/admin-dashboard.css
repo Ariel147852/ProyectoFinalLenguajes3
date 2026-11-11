@@ -26,10 +26,12 @@
 }
 
 .header-titles h1 {
+  font-family: var(--font-display, 'Outfit', sans-serif);
   font-size: 2rem;
   color: #0f172a;
   margin-bottom: 0.3rem;
   font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
 .header-titles p {
@@ -327,7 +329,8 @@
 }
 
 .stat-value {
-  font-size: 1.75rem;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 1.85rem;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.2;

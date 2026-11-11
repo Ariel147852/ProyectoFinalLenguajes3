@@ -1,63 +1,160 @@
 /* Importar estilos de Leaflet */
 @import 'leaflet/dist/leaflet.css';
 
-/* Variables de Diseño Global — Estilo Maker / Economía Circular */
+/* ================================================================
+   SISTEMA DE DISEÑO PREMIUM — TOOL LIBRARY 2026
+   Tipografía: Outfit (Headings) + Plus Jakarta Sans (Body)
+   Estética: Moderna, Circular, Limpia, con Elevación y Microinteracciones
+   ================================================================ */
+
 :root {
+  /* Tipografías Oficiales */
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Colores Principales (Ámbar Industrial Moderno) */
   --primary: #d97706;
   --primary-hover: #b45309;
+  --primary-active: #92400e;
   --primary-light: #fef3c7;
-  --primary-glow: rgba(217, 119, 6, 0.25);
+  --primary-subtle: #fffbeb;
+  --primary-glow: rgba(217, 119, 6, 0.28);
 
+  /* Acentos Secundarios (Pizarra Profunda y Elegante) */
   --secondary: #0f172a;
   --secondary-hover: #1e293b;
+  --secondary-light: #f1f5f9;
 
+  /* Sostenibilidad y Éxito (Esmeralda Eco) */
   --eco: #059669;
-  --eco-light: #d1fae5;
-  --eco-dark: #065f46;
+  --eco-hover: #047857;
+  --eco-light: #ecfdf5;
+  --eco-border: #a7f3d0;
+  --eco-dark: #064e3b;
 
+  /* Notificaciones y Estados */
+  --info: #0284c7;
+  --info-light: #f0f9ff;
+  --info-border: #bae6fd;
+
+  --warning: #d97706;
+  --warning-light: #fffbeb;
+  --warning-border: #fde68a;
+
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --danger-light: #fef2f2;
+  --danger-border: #fecaca;
+
+  /* Neutros y Superficies */
   --text-main: #0f172a;
+  --text-secondary: #334155;
   --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+
   --bg-page: #f8fafc;
   --bg-card: #ffffff;
+  --bg-card-subtle: #f8fafc;
   --border-color: #e2e8f0;
+  --border-subtle: #f1f5f9;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 14px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --shadow-glow: 0 0 15px rgba(217, 119, 6, 0.2);
+  /* Sombras Multicapa Suaves */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 4px -1px rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 20px -3px rgba(15, 23, 42, 0.07), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 16px 32px -4px rgba(15, 23, 42, 0.08), 0 6px 12px -3px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 24px 48px -12px rgba(15, 23, 42, 0.12);
+  --shadow-glow: 0 8px 24px rgba(217, 119, 6, 0.22);
+  --shadow-eco-glow: 0 8px 24px rgba(16, 185, 129, 0.22);
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 1rem;
+  /* Radios de Curvatura Modernos */
+  --radius-xs: 0.35rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.15rem;
+  --radius-xl: 1.6rem;
+  --radius-pill: 9999px;
 }
 
-/* Reset & Tipografía */
-* {
+/* Reset Global */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   color: var(--text-main);
   background-color: var(--bg-page);
-  line-height: 1.5;
+  background-image: 
+    radial-gradient(circle at 15% 10%, rgba(245, 158, 11, 0.035) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.035) 0%, transparent 45%);
+  background-attachment: fixed;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tipografía de Encabezados */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--text-main);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+h1 { font-size: 2.25rem; font-weight: 800; }
+h2 { font-size: 1.75rem; font-weight: 700; }
+h3 { font-size: 1.35rem; font-weight: 700; }
+h4 { font-size: 1.15rem; font-weight: 600; }
+
+p {
+  color: var(--text-secondary);
 }
 
 a {
   color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 button, input, select, textarea {
-  font-family: inherit;
+  font-family: var(--font-body);
 }
 
-/* Clases de Botones Globales con Microinteracciones */
+/* Scrollbar Personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ================================================================
+   BOTONES PREMIUM
+   ================================================================ */
+
 .btn {
-  padding: 0.55rem 1.15rem;
+  padding: 0.65rem 1.25rem;
   border-radius: var(--radius-md);
+  font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.92rem;
   cursor: pointer;
@@ -66,21 +163,25 @@ button, input, select, textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
+  user-select: none;
+  line-height: 1.2;
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: translateY(1px) scale(0.98);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none !important;
+  box-shadow: none !important;
 }
 
+/* Primary Button (Ámbar Cálido Gradiente) */
 .btn-primary {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
@@ -89,19 +190,23 @@ button, input, select, textarea {
 .btn-primary:hover:not(:disabled) {
   background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   box-shadow: var(--shadow-glow);
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
 }
 
+/* Secondary Button */
 .btn-secondary {
   background-color: white;
-  color: #1e293b;
+  color: var(--text-main);
   border-color: var(--border-color);
 }
 .btn-secondary:hover:not(:disabled) {
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
+/* Outline Button */
 .btn-outline {
   border-color: var(--primary);
   color: var(--primary);
@@ -110,120 +215,237 @@ button, input, select, textarea {
 .btn-outline:hover:not(:disabled) {
   background-color: var(--primary-light);
   color: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
-.btn-eco {
+/* Eco / Success Button */
+.btn-eco, .btn-success {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
+  border-color: #059669;
 }
-.btn-eco:hover:not(:disabled) {
-  background: #047857;
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+.btn-eco:hover:not(:disabled), .btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: var(--shadow-eco-glow);
+  transform: translateY(-1.5px);
 }
 
+/* Danger / Rechazar Button */
 .btn-danger {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+.btn-danger:hover:not(:disabled) {
   background-color: #fee2e2;
   color: #b91c1c;
   border-color: #fca5a5;
-}
-.btn-danger:hover:not(:disabled) {
-  background-color: #fecaca;
+  transform: translateY(-1px);
 }
 
+/* Tamaños de Botones */
 .btn-sm {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.85rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.84rem;
   border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  padding: 0.85rem 1.65rem;
+  font-size: 1.05rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
 }
 
 .btn-block {
   width: 100%;
 }
 
-/* Alertas y Notificaciones */
-.alert {
-  padding: 0.85rem 1.15rem;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  margin-bottom: 1.25rem;
+/* ================================================================
+   FORMULARIOS E INPUTS
+   ================================================================ */
+
+.form-group {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  animation: fadeIn 0.25s ease-out;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1.15rem;
 }
-.alert-error {
+
+.form-group label, .form-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: -0.01em;
+}
+
+.form-control, input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 0.72rem 1rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  color: var(--text-main);
+  background-color: #ffffff;
+  outline: none;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+}
+
+.form-control:focus, input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.14);
+}
+
+.form-control:hover:not(:focus), input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) {
+  border-color: #94a3b8;
+}
+
+/* ================================================================
+   INSIGNIAS Y BADGES
+   ================================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.badge-primary {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-success {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-warning {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-error {
   background-color: #fef2f2;
   color: #991b1b;
   border: 1px solid #fecaca;
 }
+
+.badge-secondary {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* ================================================================
+   ALERTAS
+   ================================================================ */
+
+.alert {
+  padding: 0.95rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  animation: fadeInSlide 0.25s ease-out;
+  border: 1px solid transparent;
+  font-weight: 500;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
 .alert-success {
   background-color: #f0fdf4;
   color: #166534;
-  border: 1px solid #bbf7d0;
+  border-color: #bbf7d0;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
+@keyframes fadeInSlide {
+  from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Spinner de Carga Global */
+/* ================================================================
+   SPINNER Y ESTADOS DE CARGA
+   ================================================================ */
+
 .loading-state {
   text-align: center;
-  padding: 4rem 1rem;
+  padding: 4.5rem 1.5rem;
 }
 
 .spinner {
   width: 44px;
   height: 44px;
-  border: 4px solid var(--border-color);
+  border: 3.5px solid #e2e8f0;
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.25rem;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Marcadores Personalizados para Leaflet */
+/* ================================================================
+   MARCADORES DE MAPA LEAFLET
+   ================================================================ */
+
 .leaflet-container {
-  font-family: inherit;
+  font-family: var(--font-body);
 }
 
 .tool-map-pin {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   background: white;
-  border: 2px solid var(--primary);
+  border: 2.5px solid var(--primary);
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transition: transform 0.15s ease;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.22);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
 }
 
 .tool-map-pin:hover {
-  transform: rotate(-45deg) scale(1.15);
+  transform: rotate(-45deg) scale(1.18);
   border-color: var(--primary-hover);
 }
 
 .tool-map-pin-inner {
   transform: rotate(45deg);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
 .user-pulse-marker {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   background-color: #2563eb;
   border: 3px solid white;
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.65);
   position: relative;
 }
 
