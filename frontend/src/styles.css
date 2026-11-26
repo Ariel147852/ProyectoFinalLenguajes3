@@ -465,3 +465,23 @@ button, input, select, textarea {
   0% { transform: scale(0.6); opacity: 1; }
   100% { transform: scale(1.6); opacity: 0; }
 }
+
+/* ================================================================
+   ANULAR VALIDACION NATIVA DEL NAVEGADOR (input:invalid)
+   Usamos validacion propia de Angular, no la del browser
+   ================================================================ */
+input:invalid,
+input:invalid:focus,
+select:invalid,
+textarea:invalid {
+  border-color: #cbd5e1 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background-color: #ffffff !important;
+}
+
+input:required,
+select:required,
+textarea:required {
+  box-shadow: none !important;
+}

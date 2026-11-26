@@ -10,6 +10,7 @@ import { LoanDashboardComponent } from './features/loans/loan-dashboard/loan-das
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
 import { SubscriptionComponent } from './features/subscription/subscription';
 import { FinancialDataComponent } from './features/financial-data/financial-data';
+import { DashboardComponent } from './features/dashboard/dashboard';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 
@@ -19,6 +20,7 @@ export const routes: Routes = [
   { path: 'map', component: MapViewComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'subscription', component: SubscriptionComponent, canActivate: [authGuard] },
   { path: 'financial-data', component: FinancialDataComponent, canActivate: [authGuard] },
   { path: 'tools/new', component: ToolFormComponent, canActivate: [authGuard] },

@@ -1,0 +1,168 @@
+<div class="dashboard-page">
+
+  <!-- HEADER DE BIENVENIDA -->
+  <div class="dash-welcome">
+    <div class="welcome-avatar">
+      <span>{{ user?.nombre?.charAt(0)?.toUpperCase() }}</span>
+    </div>
+    <div class="welcome-text">
+      <h1>¡Hola, {{ user?.nombre?.split(' ')[0] }}! 👋</h1>
+      <p>Bienvenido a tu panel personal de ToolLibrary. Aquí puedes ver tus préstamos, herramientas y actividad.</p>
+    </div>
+    <div class="welcome-actions">
+      <a routerLink="/tools/new" class="btn btn-primary">+ Prestar Herramienta</a>
+      <a routerLink="/catalog" class="btn btn-secondary">🔍 Explorar Catálogo</a>
+    </div>
+  </div>
+
+  <!-- ESTADÍSTICAS RÁPIDAS -->
+  <div class="dash-stats-grid">
+    <div class="stat-card stat-active">
+      <div class="stat-icon">🔧</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ activeLoans.length }}</span>
+        <span class="stat-label">Préstamos Activos</span>
+      </div>
+    </div>
+    <div class="stat-card stat-pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ pendingLoans.length }}</span>
+        <span class="stat-label">Pendientes de Aprobar</span>
+      </div>
+    </div>
+    <div class="stat-card stat-done">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ completedLoans.length }}</span>
+        <span class="stat-label">Préstamos Completados</span>
+      </div>
+    </div>
+    <div class="stat-card stat-tools">
+      <div class="stat-icon">🛠️</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ myTools().length }}</span>
+        <span class="stat-label">Mis Herramientas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL: 2 COLUMNAS -->
+  <div class="dash-main-grid">
+
+    <!-- COLUMNA IZQUIERDA: PRÉSTAMOS RECIENTES -->
+    <div class="dash-section">
+      <div class="section-header">
+        <h3>📋 Mis Préstamos Recientes</h3>
+        <a routerLink="/loans" class="section-link">Ver todos →</a>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando préstamos...</p>
+        </div>
+      } @else if (loans().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">📭</span>
+          <p>Aún no tienes préstamos registrados.</p>
+          <a routerLink="/catalog" class="btn btn-sm btn-primary">Explorar herramientas</a>
+        </div>
+      } @else {
+        <div class="loans-list">
+          @for (loan of loans(); track loan._id) {
+            <div class="loan-row">
+              <div class="loan-icon-wrap">
+                <span class="loan-icon">🔧</span>
+              </div>
+              <div class="loan-info">
+                <span class="loan-tool-name">{{ loan.herramienta?.nombre || 'Herramienta' }}</span>
+                <span class="loan-meta">
+                  {{ loan.herramienta?.categoria || '' }}
+                  @if (loan.solicitante?.nombre) {
+                    · Solicitado por <strong>{{ loan.solicitante?.nombre }}</strong>
+                  }
+                </span>
+                <span class="loan-date">{{ loan.fechaInicio | date:'dd MMM yyyy' }}</span>
+              </div>
+              <div class="loan-status">
+                <span class="dash-badge" [class]="estadoClass(loan.estado)">
+                  {{ estadoLabel(loan.estado) }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="dash-right-col">
+
+      <!-- MIS HERRAMIENTAS -->
+      <div class="dash-section">
+        <div class="section-header">
+          <h3>🛠️ Mis Herramientas</h3>
+          <a routerLink="/catalog" class="section-link">Ver catálogo →</a>
+        </div>
+
+        @if (myTools().length === 0) {
+          <div class="empty-state">
+            <span class="empty-icon">🧰</span>
+            <p>Aún no has publicado herramientas.</p>
+            <a routerLink="/tools/new" class="btn btn-sm btn-primary">+ Publicar herramienta</a>
+          </div>
+        } @else {
+          <div class="tools-mini-grid">
+            @for (tool of myTools(); track tool._id) {
+              <a [routerLink]="['/tools', tool._id]" class="tool-mini-card">
+                @if (tool.imagenUrl) {
+                  <img [src]="tool.imagenUrl" [alt]="tool.nombre" class="tool-mini-img" />
+                } @else {
+                  <div class="tool-mini-placeholder">🔧</div>
+                }
+                <div class="tool-mini-info">
+                  <span class="tool-mini-name">{{ tool.nombre }}</span>
+                  <span class="tool-mini-cat">{{ tool.categoria }}</span>
+                  <span class="tool-mini-status" [class.avail]="tool.disponible">
+                    {{ tool.disponible ? '✓ Disponible' : '× Prestada' }}
+                  </span>
+                </div>
+              </a>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- PERFIL RÁPIDO -->
+      <div class="dash-section profile-card">
+        <div class="section-header">
+          <h3>👤 Mi Perfil</h3>
+        </div>
+        <div class="profile-rows">
+          <div class="profile-row">
+            <span class="profile-label">Nombre</span>
+            <span class="profile-value">{{ user?.nombre }}</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Correo</span>
+            <span class="profile-value">{{ user?.email }}</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Teléfono</span>
+            <span class="profile-value">{{ user?.telefono || '—' }}</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Sector</span>
+            <span class="profile-value">{{ user?.direccionZona || 'Comunidad Central' }}</span>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <a routerLink="/financial-data" class="btn btn-sm btn-secondary">💳 Mis Datos de Cobro</a>
+          <a routerLink="/subscription" class="btn btn-sm btn-primary">⭐ Mi Plan</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
