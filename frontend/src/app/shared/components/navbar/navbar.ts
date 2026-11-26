@@ -11,7 +11,12 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./navbar.css']
 })
 export class NavbarComponent {
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(public authService: AuthService, public router: Router) {}
+
+  isAuthPage(): boolean {
+    const url = this.router.url;
+    return url.includes('/login') || url.includes('/register');
+  }
 
   onLogout(): void {
     this.authService.logout();
