@@ -4,22 +4,22 @@
   align-items: center;
   justify-content: center;
   padding: 3rem 1.5rem;
-  background-color: var(--bg-page, #f8fafc);
+  background-color: #0b1120;
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.05) 0%, transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.05) 0%, transparent 45%);
+    radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(5, 150, 105, 0.10) 0%, transparent 45%);
   animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
 
 .auth-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: #111827;
+  border: 1.5px solid rgba(245, 158, 11, 0.28);
   border-radius: var(--radius-lg, 1.25rem);
   padding: 2.75rem 2.25rem;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 25px rgba(245, 158, 11, 0.1);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
   position: relative;
   overflow: hidden;
@@ -36,8 +36,8 @@
 }
 
 .auth-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.09), 0 10px 15px -7px rgba(15, 23, 42, 0.05);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.75), 0 0 35px rgba(245, 158, 11, 0.18);
 }
 
 .auth-header {
@@ -50,12 +50,12 @@
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0f172a;
+  color: #f8fafc;
   margin-bottom: 0.5rem;
 }
 
 .auth-header p {
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.92rem;
   line-height: 1.5;
 }
@@ -75,33 +75,33 @@
 .form-group label {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #334155;
+  color: #e2e8f0;
   letter-spacing: -0.01em;
 }
 
 .form-group input {
   padding: 0.75rem 1rem;
-  border: 1.5px solid #cbd5e1;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--radius-md, 0.75rem);
   font-size: 0.95rem;
-  color: #0f172a;
+  color: #f8fafc;
   outline: none;
-  background-color: #ffffff;
+  background-color: #0b1120;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-group input::placeholder {
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .form-group input:hover:not(:focus) {
-  border-color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .form-group input:focus {
-  border-color: var(--primary, #d97706);
-  background-color: #ffffff;
-  box-shadow: 0 0 0 3.5px rgba(217, 119, 6, 0.16);
+  border-color: #f59e0b;
+  background-color: #0b1120;
+  box-shadow: 0 0 0 3.5px rgba(245, 158, 11, 0.22);
 }
 
 .btn-block {
@@ -115,13 +115,13 @@
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
   border: none;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.28);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
   transition: all 0.2s ease;
 }
 
 .btn-block:hover:not(:disabled) {
   background: linear-gradient(135deg, #fbbf24 0%, #b45309 100%);
-  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.38);
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45);
   transform: translateY(-2px);
 }
 
@@ -137,29 +137,29 @@
 }
 
 .alert-error {
-  background-color: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.35);
 }
 
 .auth-footer {
   text-align: center;
   margin-top: 1.75rem;
   padding-top: 1.35rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.9rem;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .auth-footer a {
-  color: var(--primary, #d97706);
+  color: #f59e0b;
   font-weight: 700;
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .auth-footer a:hover {
-  color: var(--primary-hover, #b45309);
+  color: #fbbf24;
   text-decoration: underline;
 }
 
@@ -167,4 +167,3 @@
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
