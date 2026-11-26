@@ -261,21 +261,30 @@
 
 .category-card {
   background: white;
-  padding: 2rem;
+  padding: 0;
   border-radius: var(--radius-lg, 1.15rem);
   border: 1px solid var(--border-color, #e2e8f0);
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.04);
+  position: relative;
+  overflow: hidden;
 }
 
 .category-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 35px -8px rgba(217, 119, 6, 0.16), 0 1px 3px rgba(0, 0, 0, 0.05);
   border-color: var(--primary, #d97706);
+}
+
+.category-card-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 2.25rem 2rem;
+  text-decoration: none;
+  color: inherit;
 }
 
 .category-icon-box {

@@ -1,10 +1,10 @@
-<div class="auth-container">
-  <div class="auth-card register-wide-card">
-    <div class="auth-header">
+<main class="auth-container">
+  <article class="auth-card register-wide-card">
+    <header class="auth-header">
       <div class="badge-identity">🛡️ Registro con Identidad Verificada</div>
       <h2>Crear Cuenta Comunitaria</h2>
       <p>Únete a la red de préstamo de herramientas de tu barrio completando tus datos personales y cédula</p>
-    </div>
+    </header>
 
     @if (errorMessage) {
     <div class="alert alert-error">
@@ -216,9 +216,9 @@
         }
       </button>
 
-      <div class="auth-footer">
+      <footer class="auth-footer">
         <p>¿Ya tienes una cuenta registrada? <a routerLink="/login">Inicia sesión aquí</a></p>
-      </div>
+      </footer>
     </form>
-  </div>
-</div>
+  </article>
+</main>

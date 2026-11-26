@@ -1,17 +1,17 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-header">
+<main class="auth-container">
+  <article class="auth-card">
+    <header class="auth-header">
       <h2>Iniciar Sesión</h2>
       <p>Accede para solicitar préstamos y prestar herramientas</p>
-    </div>
+    </header>
 
     @if (errorMessage) {
-      <div class="alert alert-error">
+      <div class="alert alert-error" role="alert">
         {{ errorMessage }}
       </div>
     }
 
-    <form (ngSubmit)="onSubmit()" class="auth-form">
+    <form (ngSubmit)="onSubmit()" class="auth-form" novalidate>
       <div class="form-group">
         <label for="email">Correo Electrónico</label>
         <input
@@ -20,6 +20,7 @@
           name="email"
           [(ngModel)]="email"
           placeholder="ejemplo@vecino.org"
+          autocomplete="email"
           required
         />
       </div>
@@ -32,6 +33,7 @@
           name="password"
           [(ngModel)]="password"
           placeholder="••••••••"
+          autocomplete="current-password"
           required
         />
       </div>
@@ -45,9 +47,9 @@
       </button>
     </form>
 
-    <div class="auth-footer">
+    <footer class="auth-footer">
       <p>¿No tienes una cuenta aún? <a routerLink="/register">Regístrate gratis</a></p>
-    </div>
-  </div>
-</div>
+    </footer>
+  </article>
+</main>
 

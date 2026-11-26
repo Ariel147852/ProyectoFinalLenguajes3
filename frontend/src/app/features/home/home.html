@@ -1,6 +1,6 @@
-<div class="home-container">
+<main class="home-container">
   <!-- Hero Section -->
-  <section class="hero-section">
+  <header class="hero-section">
     <div class="hero-content">
       <div class="hero-badge-wrap">
         <span class="badge badge-eco">🌱 Economía Circular & Sostenibilidad Urbana</span>
@@ -23,10 +23,10 @@
         </a>
       </div>
     </div>
-  </section>
+  </header>
 
   <!-- Impact Metrics Bar -->
-  <section class="metrics-bar">
+  <section class="metrics-bar" aria-label="Métricas de impacto comunitario">
     <div class="metric-item">
       <span class="metric-number">16+</span>
       <span class="metric-label">Herramientas en Catálogo</span>
@@ -49,39 +49,39 @@
   </section>
 
   <!-- How It Works Section -->
-  <section class="steps-section">
+  <section class="steps-section" aria-label="Cómo funciona la plataforma">
     <div class="section-title-wrap">
       <span class="sub-heading">Flujo Sencillo en 3 Pasos</span>
       <h2 class="section-title">¿Cómo funciona Tool Library?</h2>
     </div>
 
     <div class="steps-grid">
-      <div class="step-card">
+      <article class="step-card">
         <div class="step-number">1</div>
         <div class="step-icon">📍</div>
         <h3>Encuentra por Proximidad</h3>
         <p>Busca en el catálogo o visualiza en el mapa interactivo con OpenStreetMap las herramientas disponibles cerca
           de tu casa.</p>
-      </div>
-      <div class="step-card">
+      </article>
+      <article class="step-card">
         <div class="step-number">2</div>
         <div class="step-icon">📅</div>
         <h3>Reserva sin Conflictos</h3>
         <p>Selecciona tus fechas en el calendario. El motor de validación previene automáticamente cualquier
           solapamiento de horarios.</p>
-      </div>
-      <div class="step-card">
+      </article>
+      <article class="step-card">
         <div class="step-number">3</div>
         <div class="step-icon">🤝</div>
         <h3>Retira, Completa y Devuelve</h3>
         <p>Coordina la entrega con el dueño del equipo, realiza tus proyectos y devuélvelo en óptimas condiciones
           sumando reputación.</p>
-      </div>
+      </article>
     </div>
   </section>
 
   <!-- Categories Section -->
-  <section class="categories-section">
+  <section class="categories-section" aria-label="Categorías de herramientas">
     <div class="section-title-wrap">
       <span class="sub-heading">Equipamiento para todo tipo de proyecto</span>
       <h2 class="section-title">Explora por Categorías</h2>
@@ -89,24 +89,26 @@
 
     <div class="categories-grid">
       @for (cat of categories; track cat.id) {
-      <a [routerLink]="['/catalog']" [queryParams]="{ categoria: cat.id }" class="category-card">
-        <div class="category-icon-box">
-          <span class="category-icon">{{ cat.icon }}</span>
-        </div>
-        <h3>{{ cat.title }}</h3>
-        <p>{{ cat.desc }}</p>
-        <span class="category-link">Ver disponibles →</span>
-      </a>
+      <article class="category-card">
+        <a [routerLink]="['/catalog']" [queryParams]="{ categoria: cat.id }" class="category-card-link">
+          <div class="category-icon-box">
+            <span class="category-icon">{{ cat.icon }}</span>
+          </div>
+          <h3>{{ cat.title }}</h3>
+          <p>{{ cat.desc }}</p>
+          <span class="category-link">Ver disponibles →</span>
+        </a>
+      </article>
       }
     </div>
   </section>
 
   <!-- CTA Box -->
-  <section class="cta-banner">
+  <section class="cta-banner" aria-label="Llamada a la acción para compartir herramientas">
     <div class="cta-content">
       <h2>¿Tienes herramientas sin usar en tu taller o bodega?</h2>
       <p>Súmate a la biblioteca comunitaria. Comparte tus equipos con seguridad y fortalece tu vecindario.</p>
       <a routerLink="/tools/new" class="btn btn-lg btn-primary">+ Publicar una Herramienta</a>
     </div>
   </section>
-</div>
+</main>
