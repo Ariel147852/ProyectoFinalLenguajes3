@@ -52,8 +52,12 @@ export class LoginComponent {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (res) => {
         this.isLoading = false;
-        if (res.success) {
-          this.router.navigateByUrl(this.returnUrl);
+        if (res.success && res.data) {
+          if (res.data.user.rol === 'admin') {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate([this.returnUrl && this.returnUrl !== '/login' ? this.returnUrl : '/loans']);
+          }
         }
       },
       error: (err) => {
