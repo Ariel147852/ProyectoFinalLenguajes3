@@ -11,13 +11,11 @@
     </a>
 
     <nav class="nav-links">
-      @if (!isAuthPage()) {
+      @if (authService.isAuthenticated()) {
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
         <a routerLink="/catalog" routerLinkActive="active">Catálogo</a>
         <a routerLink="/map" routerLinkActive="active">Mapa Cercano</a>
-      }
 
-      @if (authService.isAuthenticated()) {
         @if (!authService.isAdmin()) {
           <a routerLink="/loans" routerLinkActive="active">📋 Mis Préstamos</a>
           <a
