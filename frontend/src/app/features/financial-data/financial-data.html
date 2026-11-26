@@ -48,14 +48,19 @@
           </div>
 
           <div class="form-group">
-            <label for="numeroCuenta">Número de Cuenta</label>
+            <label for="numeroCuenta">Número de Cuenta (solo números)</label>
             <input
               type="text"
               id="numeroCuenta"
               class="form-control mono"
               [(ngModel)]="numeroCuenta"
+              (keypress)="onlyNumbers($event)"
+              (input)="onNumeroCuentaInput()"
+              maxlength="20"
+              inputmode="numeric"
+              pattern="[0-9]*"
               name="numeroCuenta"
-              placeholder="Ej: 2204598124"
+              placeholder="Ej: 2204598124 (solo números)"
             />
           </div>
         </div>
@@ -68,21 +73,27 @@
               id="titular"
               class="form-control"
               [(ngModel)]="titular"
+              (input)="onTitularInput()"
               name="titular"
-              placeholder="Nombre y Apellido"
+              placeholder="Nombre y Apellido (solo letras)"
               required
             />
           </div>
 
           <div class="form-group">
-            <label for="telefonoDeUna">Teléfono celular DeUna *</label>
+            <label for="telefonoDeUna">Teléfono celular DeUna (10 números) *</label>
             <input
               type="tel"
               id="telefonoDeUna"
               class="form-control mono"
               [(ngModel)]="telefonoDeUna"
+              (keypress)="onlyNumbers($event)"
+              (input)="onTelefonoDeUnaInput()"
+              maxlength="10"
+              inputmode="numeric"
+              pattern="[0-9]*"
               name="telefonoDeUna"
-              placeholder="Ej: 0984445566"
+              placeholder="Ej: 0984445566 (solo números)"
             />
           </div>
         </div>

@@ -99,14 +99,66 @@ export class FinancialDataComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  // Bloquear caracteres no numéricos
+  onlyNumbers(event: KeyboardEvent): boolean {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode <= 31) {
+      return true;
+    }
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  onNumeroCuentaInput(): void {
+    // Solo números (máximo 20)
+    this.numeroCuenta = this.numeroCuenta.replace(/\D/g, '').slice(0, 20);
+  }
+
+  onTelefonoDeUnaInput(): void {
+    // Solo números (máximo 10)
+    this.telefonoDeUna = this.telefonoDeUna.replace(/\D/g, '').slice(0, 10);
+  }
+
+  onTitularInput(): void {
+    // Solo letras y espacios
+    this.titular = this.titular.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+  }
+
   removeQr(): void {
     this.qrDeUnaUrl = '';
     this.qrFileName = '';
   }
 
   onSubmit(): void {
-    this.isSaving.set(true);
     this.feedbackMessage.set('');
+
+    // Validación de Titular: solo letras
+    if (!this.titular.trim() || !/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{3,60}$/.test(this.titular.trim())) {
+      this.feedbackMessage.set('El nombre del titular debe contener únicamente letras (sin números ni símbolos)');
+      this.feedbackType.set('error');
+      return;
+    }
+
+    // Validación de Número de Cuenta: solo números
+    this.onNumeroCuentaInput();
+    if (this.numeroCuenta && (this.numeroCuenta.length < 6 || this.numeroCuenta.length > 20)) {
+      this.feedbackMessage.set('El número de cuenta bancaria debe contener únicamente números (entre 6 y 20 dígitos)');
+      this.feedbackType.set('error');
+      return;
+    }
+
+    // Validación de Teléfono DeUna: exactamente 10 números
+    this.onTelefonoDeUnaInput();
+    if (this.telefonoDeUna && this.telefonoDeUna.length !== 10) {
+      this.feedbackMessage.set(`El teléfono celular DeUna debe tener exactamente 10 dígitos numéricos (se ingresaron ${this.telefonoDeUna.length})`);
+      this.feedbackType.set('error');
+      return;
+    }
+
+    this.isSaving.set(true);
 
     const payload: DatosFinancieros = {
       banco: this.banco,

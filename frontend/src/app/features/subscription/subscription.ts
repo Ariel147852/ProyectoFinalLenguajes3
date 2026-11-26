@@ -132,11 +132,32 @@ export class SubscriptionComponent implements OnInit {
     this.comprobanteFileName = '';
   }
 
+  onlyNumbers(event: KeyboardEvent): boolean {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode <= 31) {
+      return true;
+    }
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
   onSubmitPayment(): void {
     if (!this.bancoOrigen || !this.numeroComprobante.trim() || !this.comprobanteUrl) {
       this.feedbackMessage.set('Por favor completa todos los datos y adjunta la imagen del comprobante.');
       this.feedbackType.set('error');
       return;
+    }
+
+    if (this.tipoPago === 'herramientas_extras') {
+      const extras = Number(this.cantidadHerramientasExtras);
+      if (isNaN(extras) || extras < 1 || extras > 20 || !Number.isInteger(extras)) {
+        this.feedbackMessage.set('La cantidad de herramientas extras debe ser un número entero entre 1 y 20.');
+        this.feedbackType.set('error');
+        return;
+      }
     }
 
     this.isSubmitting.set(true);

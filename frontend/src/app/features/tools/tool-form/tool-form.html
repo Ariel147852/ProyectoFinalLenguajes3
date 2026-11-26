@@ -77,12 +77,15 @@
         </div>
 
         <div class="form-group flex-1">
-          <label for="maxDias">Préstamo Máximo (Días)</label>
+          <label for="maxDias">Préstamo Máximo (Días - solo números)</label>
           <input
             type="number"
             id="maxDias"
             name="maxDias"
             [(ngModel)]="maxDiasPrestamo"
+            (keypress)="onlyNumbers($event)"
+            inputmode="numeric"
+            pattern="[0-9]*"
             min="1"
             max="30"
           />

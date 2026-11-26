@@ -22,7 +22,8 @@
             id="nombre"
             name="nombre"
             [(ngModel)]="nombre"
-            placeholder="Ej: Lucía Benítez"
+            (input)="onNombreInput()"
+            placeholder="Ej: Lucía Benítez (solo letras)"
             required
           />
         </div>
@@ -44,7 +45,7 @@
       <div class="form-row-2">
         <div class="form-group">
           <div class="label-with-badge">
-            <label for="cedula">Cédula de Identidad (Ecuador) *</label>
+            <label for="cedula">Cédula de Identidad (Ecuador - 10 números) *</label>
             @if (cedulaValida === true) {
               <span class="cedula-status-badge valid">✓ Válida</span>
             } @else if (cedulaValida === false) {
@@ -56,9 +57,12 @@
             id="cedula"
             name="cedula"
             maxlength="10"
+            inputmode="numeric"
+            pattern="[0-9]*"
             [(ngModel)]="cedula"
+            (keypress)="onlyNumbers($event)"
             (input)="onCedulaInput()"
-            placeholder="Ej: 1718845629 (10 dígitos)"
+            placeholder="Ej: 1718845629 (solo 10 números)"
             [class.input-valid]="cedulaValida === true"
             [class.input-invalid]="cedulaValida === false"
             required
@@ -71,14 +75,18 @@
         </div>
 
         <div class="form-group">
-          <label for="telefono">Teléfono Celular / WhatsApp *</label>
+          <label for="telefono">Teléfono Celular (10 números) *</label>
           <input
             type="tel"
             id="telefono"
             name="telefono"
             maxlength="10"
+            inputmode="numeric"
+            pattern="[0-9]*"
             [(ngModel)]="telefono"
-            placeholder="0984445566"
+            (keypress)="onlyNumbers($event)"
+            (input)="onTelefonoInput()"
+            placeholder="Ej: 0984445566 (solo números)"
             required
           />
         </div>

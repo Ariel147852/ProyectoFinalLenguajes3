@@ -35,7 +35,58 @@ export const register = async (req: Request, res: Response, next: NextFunction):
       return;
     }
 
-    // Validación de Cédula Ecuatoriana (Módulo 10)
+    // Validación de Nombre: solo letras y espacios, sin números
+    const cleanNombre = nombre.trim();
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{3,60}$/.test(cleanNombre)) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'El nombre completo debe contener únicamente letras y espacios (no se admiten números ni símbolos especiales)'
+      });
+      return;
+    }
+
+    // Validación de Email
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'Por favor ingrese un correo electrónico válido'
+      });
+      return;
+    }
+
+    // Validación de Contraseña
+    if (password.length < 6) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      });
+      return;
+    }
+
+    // Validación de Teléfono: solo números y exactamente 10 dígitos (Ecuador: 09... o 10 números)
+    const cleanTelefono = telefono.trim();
+    if (!/^\d+$/.test(cleanTelefono)) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'El número de teléfono celular debe contener solo números, no se admiten letras'
+      });
+      return;
+    }
+    if (cleanTelefono.length !== 10) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: `El número de teléfono debe tener exactamente 10 dígitos numéricos (se ingresaron ${cleanTelefono.length})`
+      });
+      return;
+    }
+
+    // Validación de Cédula Ecuatoriana (Módulo 10, 10 números)
     const validacionCedula = validarCedulaEcuatoriana(cedula);
     if (!validacionCedula.valida) {
       ApiResponse.error({
@@ -255,12 +306,64 @@ export const updateDatosFinancieros = async (req: AuthenticatedRequest, res: Res
 
     const { banco, tipoCuenta, numeroCuenta, titular, telefonoDeUna, qrDeUnaUrl } = req.body;
 
+    // Validación de Titular: solo letras y espacios
+    if (titular && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{3,60}$/.test(titular.trim())) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'El nombre del titular debe contener únicamente letras y espacios (sin números)'
+      });
+      return;
+    }
+
+    // Validación de Número de Cuenta: solo números
+    const cleanCuenta = numeroCuenta ? numeroCuenta.trim() : '';
+    if (cleanCuenta) {
+      if (!/^\d+$/.test(cleanCuenta)) {
+        ApiResponse.error({
+          res,
+          statusCode: 400,
+          message: 'El número de cuenta bancaria debe contener únicamente números, no se admiten letras'
+        });
+        return;
+      }
+      if (cleanCuenta.length < 6 || cleanCuenta.length > 20) {
+        ApiResponse.error({
+          res,
+          statusCode: 400,
+          message: 'El número de cuenta bancaria debe tener entre 6 y 20 dígitos numéricos'
+        });
+        return;
+      }
+    }
+
+    // Validación de Teléfono DeUna: solo números y 10 dígitos
+    const cleanTelDeUna = telefonoDeUna ? telefonoDeUna.trim() : '';
+    if (cleanTelDeUna) {
+      if (!/^\d+$/.test(cleanTelDeUna)) {
+        ApiResponse.error({
+          res,
+          statusCode: 400,
+          message: 'El teléfono DeUna debe contener únicamente números, no se admiten letras'
+        });
+        return;
+      }
+      if (cleanTelDeUna.length !== 10) {
+        ApiResponse.error({
+          res,
+          statusCode: 400,
+          message: `El teléfono DeUna debe tener exactamente 10 dígitos numéricos (se ingresaron ${cleanTelDeUna.length})`
+        });
+        return;
+      }
+    }
+
     user.datosFinancieros = {
       banco: banco ? banco.trim() : 'Banco Pichincha',
       tipoCuenta: tipoCuenta ? tipoCuenta.trim() : 'Cuenta de Ahorros',
-      numeroCuenta: numeroCuenta ? numeroCuenta.trim() : '',
+      numeroCuenta: cleanCuenta,
       titular: titular ? titular.trim() : user.nombre,
-      telefonoDeUna: telefonoDeUna ? telefonoDeUna.trim() : user.telefono || '',
+      telefonoDeUna: cleanTelDeUna || user.telefono || '',
       qrDeUnaUrl: qrDeUnaUrl ? qrDeUnaUrl.trim() : (user.datosFinancieros?.qrDeUnaUrl || '')
     };
 

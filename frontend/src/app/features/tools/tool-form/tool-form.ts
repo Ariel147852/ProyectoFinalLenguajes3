@@ -126,9 +126,27 @@ export class ToolFormComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  onlyNumbers(event: KeyboardEvent): boolean {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode <= 31) {
+      return true;
+    }
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
   onSubmit(): void {
-    if (!this.nombre || !this.descripcion || !this.direccionZona) {
+    if (!this.nombre.trim() || !this.descripcion.trim() || !this.direccionZona.trim()) {
       this.errorMessage = 'Por favor complete todos los campos obligatorios';
+      return;
+    }
+
+    const dias = Number(this.maxDiasPrestamo);
+    if (isNaN(dias) || dias < 1 || dias > 30 || !Number.isInteger(dias)) {
+      this.errorMessage = 'El máximo de días de préstamo debe ser un número entero entre 1 y 30';
       return;
     }
 

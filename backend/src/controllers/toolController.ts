@@ -165,6 +165,29 @@ export const createTool = async (req: AuthenticatedRequest, res: Response, next:
       return;
     }
 
+    // Validación numérica de coordenadas
+    const numLat = Number(latitud);
+    const numLng = Number(longitud);
+    if (isNaN(numLat) || isNaN(numLng) || numLat < -90 || numLat > 90 || numLng < -180 || numLng > 180) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'Las coordenadas geográficas deben ser números válidos (-90 a 90 lat, -180 a 180 lng)'
+      });
+      return;
+    }
+
+    // Validación numérica de días de préstamo (solo números enteros del 1 al 30)
+    const diasVal = maxDiasPrestamo !== undefined ? Number(maxDiasPrestamo) : 7;
+    if (isNaN(diasVal) || diasVal < 1 || diasVal > 30 || !Number.isInteger(diasVal)) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'El máximo de días de préstamo debe ser un número entero entre 1 y 30'
+      });
+      return;
+    }
+
     const userId = req.user?.id;
     const user = await User.findById(userId);
     if (!user) {
@@ -270,13 +293,34 @@ export const updateTool = async (req: AuthenticatedRequest, res: Response, next:
     if (estadoFisico) tool.estadoFisico = estadoFisico;
     if (imagenes) tool.imagenes = imagenes;
     if (direccionZona) tool.direccionZona = direccionZona;
-    if (maxDiasPrestamo) tool.maxDiasPrestamo = Number(maxDiasPrestamo);
+    if (maxDiasPrestamo !== undefined) {
+      const diasVal = Number(maxDiasPrestamo);
+      if (isNaN(diasVal) || diasVal < 1 || diasVal > 30 || !Number.isInteger(diasVal)) {
+        ApiResponse.error({
+          res,
+          statusCode: 400,
+          message: 'El máximo de días de préstamo debe ser un número entero entre 1 y 30'
+        });
+        return;
+      }
+      tool.maxDiasPrestamo = diasVal;
+    }
     if (activa !== undefined) tool.activa = activa;
 
     if (latitud !== undefined && longitud !== undefined) {
+      const numLat = Number(latitud);
+      const numLng = Number(longitud);
+      if (isNaN(numLat) || isNaN(numLng) || numLat < -90 || numLat > 90 || numLng < -180 || numLng > 180) {
+        ApiResponse.error({
+          res,
+          statusCode: 400,
+          message: 'Las coordenadas geográficas deben ser números válidos'
+        });
+        return;
+      }
       tool.ubicacion = {
         type: 'Point',
-        coordinates: [Number(longitud), Number(latitud)]
+        coordinates: [numLng, numLat]
       };
     }
 

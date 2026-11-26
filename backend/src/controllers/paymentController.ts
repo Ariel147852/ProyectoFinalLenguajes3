@@ -170,7 +170,16 @@ export const crearComprobantePago = async (
       monto = 5.0; // Tarifa mensual fija
       extras = 0;
     } else {
-      extras = Math.max(1, parseInt(cantidadHerramientasExtras, 10) || 1);
+      const parsedExtras = Number(cantidadHerramientasExtras);
+      if (isNaN(parsedExtras) || parsedExtras < 1 || parsedExtras > 20 || !Number.isInteger(parsedExtras)) {
+        ApiResponse.error({
+          res,
+          statusCode: 400,
+          message: 'La cantidad de herramientas extras debe ser un número entero entre 1 y 20'
+        });
+        return;
+      }
+      extras = parsedExtras;
       monto = Number((extras * 0.5).toFixed(2)); // $0.50 por herramienta extra
     }
 
