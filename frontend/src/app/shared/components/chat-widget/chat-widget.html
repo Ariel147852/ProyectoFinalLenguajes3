@@ -1,4 +1,7 @@
-﻿<!-- Floating Action Button -->
+﻿<!-- Chat Vecinal: solo visible para usuarios autenticados -->
+@if (authService.isAuthenticated()) {
+
+<!-- Floating Action Button -->
 <div class="chat-fab-wrapper">
   @if (!isOpen()) {
     <button (click)="toggleChat()" class="chat-fab" title="Abrir chat comunitario en tiempo real">
@@ -10,7 +13,6 @@
     </button>
   }
 </div>
-
 <!-- Floating Chatbox Window -->
 @if (isOpen()) {
   <div class="chatbox-modal">
@@ -215,4 +217,6 @@
       }
     </div>
   </div>
+}
+
 }
