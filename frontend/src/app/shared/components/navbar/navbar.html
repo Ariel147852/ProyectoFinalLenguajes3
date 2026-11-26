@@ -16,9 +16,8 @@
       <a routerLink="/map" routerLinkActive="active">Mapa Cercano</a>
 
       @if (authService.isAuthenticated()) {
-        <a routerLink="/loans" routerLinkActive="active">📋 Mis Préstamos</a>
-
         @if (!authService.isAdmin()) {
+          <a routerLink="/loans" routerLinkActive="active">📋 Mis Préstamos</a>
           <a
             routerLink="/financial-data"
             routerLinkActive="active"
@@ -35,13 +34,12 @@
           >
             ⭐ Mi Plan ($5)
           </a>
+          <a routerLink="/tools/new" class="btn btn-primary btn-sm btn-action">+ Prestar Herramienta</a>
         }
         
         @if (authService.isAdmin()) {
           <a routerLink="/admin" routerLinkActive="active" class="admin-link">🛡️ Panel Admin</a>
         }
-
-        <a routerLink="/tools/new" class="btn btn-primary btn-sm btn-action">+ Prestar Herramienta</a>
       }
     </nav>
 
