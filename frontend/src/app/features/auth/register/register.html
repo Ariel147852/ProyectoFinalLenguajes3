@@ -22,8 +22,76 @@
         </div>
 
         <div class="form-group">
-          <label for="email">Correo Electrónico *</label>
-          <input type="email" id="email" name="email" [(ngModel)]="email" placeholder="lucia@vecina.org" required />
+          <div class="label-with-badge">
+            <label for="email">Correo Electrónico *</label>
+            @if (codigoVerificado) {
+              <span class="cedula-status-badge valid">✓ Correo Verificado</span>
+            }
+          </div>
+          <div class="input-with-action">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="email"
+              [disabled]="codigoVerificado"
+              placeholder="lucia@vecina.org"
+              required
+            />
+            @if (!codigoVerificado) {
+              <button
+                type="button"
+                class="btn btn-sm btn-secondary btn-send-code"
+                (click)="onSendVerificationCode()"
+                [disabled]="isSendingCode || !email"
+              >
+                {{ isSendingCode ? 'Enviando...' : (codigoEnviado ? 'Reenviar Código' : 'Enviar Código ✉️') }}
+              </button>
+            }
+          </div>
+
+          <!-- Si el código fue enviado, mostrar campo para ingresar los 6 dígitos -->
+          @if (codigoEnviado && !codigoVerificado) {
+            <div class="verify-code-box">
+              <div class="code-box-header">
+                <span class="code-icon">🔐</span>
+                <span>Ingresa el código de 6 números enviado a tu correo:</span>
+              </div>
+              <div class="code-input-row">
+                <input
+                  type="text"
+                  name="codigoVerificacion"
+                  maxlength="6"
+                  inputmode="numeric"
+                  [(ngModel)]="codigoVerificacion"
+                  (keypress)="onlyNumbers($event)"
+                  placeholder="Ej: 489201"
+                  class="code-input mono"
+                />
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary btn-verify-action"
+                  (click)="onVerifyCode()"
+                  [disabled]="isVerifyingCode || codigoVerificacion.length !== 6"
+                >
+                  {{ isVerifyingCode ? 'Validando...' : 'Confirmar Código ✓' }}
+                </button>
+              </div>
+
+              <!-- Banner de código para demostración sin requerir SMTP -->
+              @if (simulatedCode) {
+                <div class="code-demo-pill" (click)="useSimulatedCode()" title="Haz clic para autocompletar">
+                  ⚡ Código de verificación generado: <strong>{{ simulatedCode }}</strong> (clic aquí para autocompletar)
+                </div>
+              }
+            </div>
+          }
+
+          @if (codeFeedback) {
+            <span class="cedula-hint" [class.hint-valid]="codigoVerificado" [class.hint-pending]="!codigoVerificado">
+              {{ codeFeedback }}
+            </span>
+          }
         </div>
       </div>
 

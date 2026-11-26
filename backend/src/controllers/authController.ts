@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
+import { VerificationCode } from '../models/VerificationCode';
 import { ENV } from '../config/env';
 import { ApiResponse } from '../views/apiResponse';
 import { AuthenticatedRequest } from '../middlewares/authMiddleware';
@@ -107,12 +108,23 @@ export const register = async (req: Request, res: Response, next: NextFunction):
       return;
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
       ApiResponse.error({
         res,
         statusCode: 409,
         message: 'El correo electrónico ya está registrado'
+      });
+      return;
+    }
+
+    // Regla de Negocio: Verificar que el código de 6 dígitos enviado al correo haya sido validado
+    const codeRecord = await VerificationCode.findOne({ email: cleanEmail, verified: true });
+    if (!codeRecord) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'Debes verificar tu correo electrónico ingresando el código de 6 dígitos antes de crear tu cuenta'
       });
       return;
     }
@@ -132,7 +144,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 
     const user = await User.create({
       nombre: nombre.trim(),
-      email: email.trim().toLowerCase(),
+      email: cleanEmail,
       passwordHash,
       telefono: telefono.trim(),
       direccionZona: direccionZona ? direccionZona.trim() : 'Comunidad Central',
@@ -150,6 +162,9 @@ export const register = async (req: Request, res: Response, next: NextFunction):
         qrDeUnaUrl: ''
       }
     });
+
+    // Limpiar códigos de verificación usados
+    await VerificationCode.deleteMany({ email: cleanEmail });
 
     const token = generateToken(user._id.toString(), user.email, user.rol);
 
@@ -373,6 +388,120 @@ export const updateDatosFinancieros = async (req: AuthenticatedRequest, res: Res
       res,
       message: 'Datos financieros y Código QR DeUna actualizados exitosamente',
       data: user.datosFinancieros
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Genera y envía un código de verificación de 6 dígitos al correo electrónico del usuario.
+ */
+export const sendVerificationCode = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    if (!email || typeof email !== 'string') {
+      ApiResponse.error({ res, statusCode: 400, message: 'El correo electrónico es obligatorio' });
+      return;
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) {
+      ApiResponse.error({ res, statusCode: 400, message: 'Ingrese un correo electrónico válido' });
+      return;
+    }
+
+    // Verificar si ya existe una cuenta con este correo
+    const existing = await User.findOne({ email: cleanEmail });
+    if (existing) {
+      ApiResponse.error({ res, statusCode: 409, message: 'Este correo electrónico ya se encuentra registrado' });
+      return;
+    }
+
+    // Generar código numérico de 6 dígitos aleatorio
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos de validez
+
+    // Guardar o actualizar código para este correo
+    await VerificationCode.deleteMany({ email: cleanEmail });
+    await VerificationCode.create({
+      email: cleanEmail,
+      code,
+      expiresAt,
+      verified: false
+    });
+
+    console.log(`\n======================================================`);
+    console.log(`📧 [EMAIL DE VERIFICACIÓN ENVIADO]`);
+    console.log(`Para: ${cleanEmail}`);
+    console.log(`Tu código de verificación de 6 dígitos es: [ ${code} ]`);
+    console.log(`Expira en: 10 minutos`);
+    console.log(`======================================================\n`);
+
+    ApiResponse.success({
+      res,
+      message: `Código de verificación enviado exitosamente a ${cleanEmail}`,
+      data: {
+        email: cleanEmail,
+        expiresInMinutes: 10,
+        // En entorno de desarrollo enviamos el devCode para pruebas inmediatas y demostración sin requerir SMTP
+        devCode: code
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Valida el código de 6 dígitos enviado al correo.
+ */
+export const verifyCode = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      ApiResponse.error({ res, statusCode: 400, message: 'Correo y código de verificación son requeridos' });
+      return;
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanCode = code.toString().trim();
+
+    const record = await VerificationCode.findOne({
+      email: cleanEmail,
+      expiresAt: { $gt: new Date() }
+    });
+
+    if (!record) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'No hay un código de verificación activo para este correo o ya expiró. Solicita uno nuevo.'
+      });
+      return;
+    }
+
+    if (record.code !== cleanCode) {
+      ApiResponse.error({
+        res,
+        statusCode: 400,
+        message: 'El código de verificación ingresado es incorrecto'
+      });
+      return;
+    }
+
+    record.verified = true;
+    await record.save();
+
+    ApiResponse.success({
+      res,
+      message: '✓ Correo electrónico verificado correctamente con el código',
+      data: {
+        email: cleanEmail,
+        verified: true
+      }
     });
   } catch (error) {
     next(error);

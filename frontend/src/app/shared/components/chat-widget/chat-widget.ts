@@ -47,6 +47,14 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
   newMessage = '';
   unreadCount = signal<number>(0);
 
+  // Canales y Salas Persona a Persona
+  currentRoom = signal<string>('comunidad_general');
+  contactRooms = [
+    { id: 'comunidad_general', label: '🌐 Comunidad General (#todos)' },
+    { id: 'dm_carlos_lucia', label: '👤 Carlos Mendoza ↔ Lucía Benítez (Privado)' },
+    { id: 'dm_soporte_admin', label: '👑 Chat Directo con Administrador (Privado)' }
+  ];
+
   // Multimedia adjunta pendiente de envío
   pendingMedia = signal<PendingMedia | null>(null);
   uploadError = signal<string>('');
@@ -68,14 +76,17 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
 
     // 2. Suscribirse a mensajes entrantes por WebSocket en tiempo real
     const msgSub = this.chatService.message$.subscribe((newMsg: ChatMessage) => {
-      this.messages.update((list) => [...list, newMsg]);
+      // Filtrar mensajes que correspondan a la sala activa actual
+      const msgRoom = newMsg.sala || 'comunidad_general';
+      if (msgRoom === this.currentRoom()) {
+        this.messages.update((list) => [...list, newMsg]);
+        this.scrollToBottom();
+        this.cdr.markForCheck();
+      }
 
       if (!this.isOpen()) {
         this.unreadCount.update((c) => c + 1);
       }
-
-      this.scrollToBottom();
-      this.cdr.markForCheck();
     });
 
     const connSub = this.chatService.isConnected$.subscribe((connected: boolean) => {
@@ -87,8 +98,14 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
     this.subscriptions.add(connSub);
   }
 
-  loadHistory(): void {
-    this.chatService.getHistory().subscribe({
+  onRoomChange(newRoomId: string): void {
+    this.currentRoom.set(newRoomId);
+    this.chatService.joinRoom(newRoomId);
+    this.loadHistory(newRoomId);
+  }
+
+  loadHistory(sala: string = this.currentRoom()): void {
+    this.chatService.getHistory(sala).subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.messages.set(res.data);
@@ -175,6 +192,7 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
       nombreUsuario: user.nombre,
       rolUsuario: user.rol,
       mensaje: text,
+      sala: this.currentRoom(),
       tipoContenido: media ? media.tipo : 'texto',
       mediaUrl: media ? media.url : ''
     });

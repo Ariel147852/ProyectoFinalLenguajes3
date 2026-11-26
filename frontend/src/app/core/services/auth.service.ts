@@ -27,6 +27,20 @@ export class AuthService {
     }
   }
 
+  sendVerificationCode(email: string): Observable<ApiResponse<{ email: string; expiresInMinutes: number; devCode?: string }>> {
+    return this.http.post<ApiResponse<{ email: string; expiresInMinutes: number; devCode?: string }>>(
+      `${this.API_URL}/send-verification-code`,
+      { email }
+    );
+  }
+
+  verifyCode(email: string, code: string): Observable<ApiResponse<{ email: string; verified: boolean }>> {
+    return this.http.post<ApiResponse<{ email: string; verified: boolean }>>(
+      `${this.API_URL}/verify-code`,
+      { email, code }
+    );
+  }
+
   register(payload: {
     nombre: string;
     email: string;

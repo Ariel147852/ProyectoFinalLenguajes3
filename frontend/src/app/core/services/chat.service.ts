@@ -42,6 +42,12 @@ export class ChatService implements OnDestroy {
     });
   }
 
+  joinRoom(sala: string): void {
+    if (this.socket) {
+      this.socket.emit('join_room', sala);
+    }
+  }
+
   getHistory(sala: string = 'comunidad_general'): Observable<ApiResponse<ChatMessage[]>> {
     return this.http.get<ApiResponse<ChatMessage[]>>(`${this.API_URL}/history?sala=${sala}`);
   }

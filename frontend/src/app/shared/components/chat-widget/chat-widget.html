@@ -1,4 +1,4 @@
-<!-- Floating Action Button -->
+﻿<!-- Floating Action Button -->
 <div class="chat-fab-wrapper">
   @if (!isOpen()) {
     <button (click)="toggleChat()" class="chat-fab" title="Abrir chat comunitario en tiempo real">
@@ -29,11 +29,19 @@
       <button (click)="toggleChat()" class="btn-close-chat" title="Cerrar chat">✕</button>
     </div>
 
-    <!-- Channel info -->
-    <div class="channel-banner">
-      <span>📣 Canal: <strong>#general</strong> — Envía mensajes, fotos y videos de tus herramientas</span>
+    <!-- Room / Channel Tabs -->
+    <div class="room-tabs">
+      @for (room of contactRooms; track room.id) {
+        <button
+          type="button"
+          class="room-tab"
+          [class.room-tab-active]="currentRoom() === room.id"
+          (click)="onRoomChange(room.id)"
+        >
+          {{ room.label }}
+        </button>
+      }
     </div>
-
     <!-- Messages Container -->
     <div class="chatbox-messages" #messagesScroll>
       @if (messages().length === 0) {

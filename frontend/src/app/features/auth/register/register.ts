@@ -23,6 +23,15 @@ export class RegisterComponent {
   cedulaValida: boolean | null = null;
   cedulaMensaje = '';
 
+  // Verificación por Código de Correo
+  codigoVerificacion = '';
+  codigoEnviado = false;
+  codigoVerificado = false;
+  isSendingCode = false;
+  isVerifyingCode = false;
+  simulatedCode = '';
+  codeFeedback = '';
+
   cedulaFrontalUrl = '';
   cedulaPosteriorUrl = '';
   frontalFileName = '';
@@ -127,6 +136,65 @@ export class RegisterComponent {
     }
   }
 
+  onSendVerificationCode(): void {
+    const cleanEmail = this.email.trim().toLowerCase();
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) {
+      this.errorMessage = 'Por favor ingresa un correo electrónico válido para enviarte el código de verificación';
+      return;
+    }
+
+    this.isSendingCode = true;
+    this.errorMessage = '';
+    this.codeFeedback = '';
+
+    this.authService.sendVerificationCode(cleanEmail).subscribe({
+      next: (res) => {
+        this.isSendingCode = false;
+        this.codigoEnviado = true;
+        this.codeFeedback = `Código enviado a ${cleanEmail}. Revisa tu bandeja de entrada.`;
+        if (res.data?.devCode) {
+          this.simulatedCode = res.data.devCode;
+        }
+      },
+      error: (err) => {
+        this.isSendingCode = false;
+        this.errorMessage = err.error?.message || 'Error al enviar el código de verificación';
+      }
+    });
+  }
+
+  useSimulatedCode(): void {
+    if (this.simulatedCode) {
+      this.codigoVerificacion = this.simulatedCode;
+      this.onVerifyCode();
+    }
+  }
+
+  onVerifyCode(): void {
+    const cleanEmail = this.email.trim().toLowerCase();
+    const cleanCode = this.codigoVerificacion.trim();
+
+    if (!cleanCode || cleanCode.length !== 6) {
+      this.errorMessage = 'El código de verificación debe tener exactamente 6 dígitos numéricos';
+      return;
+    }
+
+    this.isVerifyingCode = true;
+    this.errorMessage = '';
+
+    this.authService.verifyCode(cleanEmail, cleanCode).subscribe({
+      next: (res) => {
+        this.isVerifyingCode = false;
+        this.codigoVerificado = true;
+        this.codeFeedback = '✓ Correo electrónico verificado exitosamente con código';
+      },
+      error: (err) => {
+        this.isVerifyingCode = false;
+        this.errorMessage = err.error?.message || 'Código de verificación incorrecto o expirado';
+      }
+    });
+  }
+
   onSubmit(): void {
     if (!this.nombre.trim() || !this.email.trim() || !this.password || !this.telefono.trim() || !this.cedula.trim()) {
       this.errorMessage = 'Por favor completa todos los datos obligatorios';
@@ -142,6 +210,12 @@ export class RegisterComponent {
     // Validación de Email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(this.email.trim())) {
       this.errorMessage = 'Por favor ingresa un correo electrónico válido';
+      return;
+    }
+
+    // Regla de Negocio: Correo debe estar verificado con el código
+    if (!this.codigoVerificado) {
+      this.errorMessage = 'Debes verificar tu correo electrónico ingresando el código de 6 dígitos antes de crear tu cuenta';
       return;
     }
 

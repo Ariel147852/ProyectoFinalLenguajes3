@@ -618,3 +618,32 @@
 .lightbox-caption p {
   margin: 0;
 }
+
+/* === Room / Channel Tabs (Chat persona a persona) === */
+.room-tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  background: #f1f5f9;
+  border-bottom: 2px solid #e2e8f0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.room-tabs::-webkit-scrollbar { display: none; }
+.room-tab {
+  flex-shrink: 0;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  text-align: left;
+}
+.room-tab:hover { color: #0f172a; background: rgba(15,23,42,0.05); }
+.room-tab-active { color: #d97706; border-bottom-color: #d97706; background: white; }
