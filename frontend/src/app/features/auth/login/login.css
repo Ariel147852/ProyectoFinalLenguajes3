@@ -1,30 +1,28 @@
 .auth-container {
-  min-height: calc(90vh - 80px);
+  min-height: calc(100vh - 75px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 3rem 1.5rem;
-  background: 
-    radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.15) 0%, transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(5, 150, 105, 0.12) 0%, transparent 50%),
-    linear-gradient(145deg, #0b1120 0%, #0f172a 45%, #1e293b 100%);
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+  background-color: var(--bg-page, #f8fafc);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.05) 0%, transparent 45%);
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
 .auth-card {
-  background: rgba(30, 41, 59, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg, 1.25rem);
   padding: 2.75rem 2.25rem;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.08);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
 }
 
 .auth-card::before {
@@ -34,12 +32,12 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #f59e0b 0%, #d97706 50%, #10b981 100%);
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 60%, #059669 100%);
 }
 
 .auth-card:hover {
-  border-color: rgba(245, 158, 11, 0.35);
-  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 0 35px rgba(245, 158, 11, 0.15);
+  border-color: #cbd5e1;
+  box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.09), 0 10px 15px -7px rgba(15, 23, 42, 0.05);
 }
 
 .auth-header {
@@ -52,12 +50,12 @@
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #f8fafc;
+  color: #0f172a;
   margin-bottom: 0.5rem;
 }
 
 .auth-header p {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.92rem;
   line-height: 1.5;
 }
@@ -77,33 +75,33 @@
 .form-group label {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #cbd5e1;
+  color: #334155;
   letter-spacing: -0.01em;
 }
 
 .form-group input {
   padding: 0.75rem 1rem;
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border: 1.5px solid #cbd5e1;
   border-radius: var(--radius-md, 0.75rem);
   font-size: 0.95rem;
-  color: #f8fafc;
+  color: #0f172a;
   outline: none;
-  background-color: rgba(15, 23, 42, 0.6);
+  background-color: #ffffff;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-group input::placeholder {
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .form-group input:hover:not(:focus) {
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: #94a3b8;
 }
 
 .form-group input:focus {
-  border-color: #f59e0b;
-  background-color: rgba(15, 23, 42, 0.85);
-  box-shadow: 0 0 0 3.5px rgba(245, 158, 11, 0.22);
+  border-color: var(--primary, #d97706);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3.5px rgba(217, 119, 6, 0.16);
 }
 
 .btn-block {
@@ -117,13 +115,13 @@
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
   border: none;
-  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.28);
   transition: all 0.2s ease;
 }
 
 .btn-block:hover:not(:disabled) {
   background: linear-gradient(135deg, #fbbf24 0%, #b45309 100%);
-  box-shadow: 0 8px 22px rgba(217, 119, 6, 0.45);
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.38);
   transform: translateY(-2px);
 }
 
@@ -139,29 +137,29 @@
 }
 
 .alert-error {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
 .auth-footer {
   text-align: center;
   margin-top: 1.75rem;
   padding-top: 1.35rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid #f1f5f9;
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .auth-footer a {
-  color: #f59e0b;
+  color: var(--primary, #d97706);
   font-weight: 700;
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .auth-footer a:hover {
-  color: #fbbf24;
+  color: var(--primary-hover, #b45309);
   text-decoration: underline;
 }
 

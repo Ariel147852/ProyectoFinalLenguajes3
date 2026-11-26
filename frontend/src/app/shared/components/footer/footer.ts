@@ -56,7 +56,7 @@ import { RouterModule } from '@angular/router';
       background-color: #0f172a;
       color: #94a3b8;
       padding: 3.5rem 1.5rem 1.5rem;
-      margin-top: 5rem;
+      margin-top: 0;
       border-top: 1px solid #1e293b;
     }
     .footer-content {
