@@ -50,6 +50,8 @@
               <span class="cedula-status-badge valid">✓ Válida</span>
             } @else if (cedulaValida === false) {
               <span class="cedula-status-badge invalid">✕ Inválida</span>
+            } @else if (cedula.length > 0) {
+              <span class="cedula-status-badge pending">{{ cedula.length }}/10</span>
             }
           </div>
           <input
@@ -58,7 +60,6 @@
             name="cedula"
             maxlength="10"
             inputmode="numeric"
-            pattern="[0-9]*"
             [(ngModel)]="cedula"
             (keypress)="onlyNumbers($event)"
             (input)="onCedulaInput()"
@@ -68,7 +69,12 @@
             required
           />
           @if (cedulaMensaje) {
-            <span class="cedula-hint" [class.hint-valid]="cedulaValida" [class.hint-invalid]="!cedulaValida">
+            <span
+              class="cedula-hint"
+              [class.hint-valid]="cedulaValida === true"
+              [class.hint-invalid]="cedulaValida === false"
+              [class.hint-pending]="cedulaValida === null"
+            >
               {{ cedulaMensaje }}
             </span>
           }
@@ -82,7 +88,6 @@
             name="telefono"
             maxlength="10"
             inputmode="numeric"
-            pattern="[0-9]*"
             [(ngModel)]="telefono"
             (keypress)="onlyNumbers($event)"
             (input)="onTelefonoInput()"

@@ -67,15 +67,17 @@ export class RegisterComponent {
       return;
     }
 
+    // Mientras el usuario está escribiendo y no ha completado los 10 dígitos, no marcar como inválida (rojo)
     if (clean.length < 10) {
-      this.cedulaValida = false;
-      this.cedulaMensaje = `Faltan ${10 - clean.length} números (debe tener 10 dígitos)`;
+      this.cedulaValida = null;
+      this.cedulaMensaje = `Ingresando cédula: ${clean.length} de 10 dígitos`;
       return;
     }
 
+    // Al completar los 10 dígitos, validar con algoritmo Módulo 10
     const res = validarCedulaEcuatoriana(clean);
     this.cedulaValida = res.valida;
-    this.cedulaMensaje = res.valida ? '✓ Cédula ecuatoriana válida' : (res.mensaje || 'Cédula inválida');
+    this.cedulaMensaje = res.valida ? '✓ Cédula ecuatoriana válida' : (res.mensaje || 'Cédula no válida');
   }
 
   onTelefonoInput(): void {

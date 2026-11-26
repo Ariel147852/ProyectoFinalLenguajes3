@@ -51,6 +51,12 @@
   color: #991b1b;
 }
 
+.cedula-status-badge.pending {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
 .input-valid {
   border-color: #10b981 !important;
   background: #f0fdf4;
@@ -73,6 +79,11 @@
 
 .hint-invalid {
   color: #dc2626;
+  font-weight: 500;
+}
+
+.hint-pending {
+  color: #64748b;
   font-weight: 500;
 }
 
