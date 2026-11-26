@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'map', component: MapViewComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard, adminGuard] },
   { path: 'subscription', component: SubscriptionComponent, canActivate: [authGuard] },
   { path: 'financial-data', component: FinancialDataComponent, canActivate: [authGuard] },
   { path: 'tools/new', component: ToolFormComponent, canActivate: [authGuard] },
