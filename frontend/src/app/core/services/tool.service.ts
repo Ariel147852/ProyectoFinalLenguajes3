@@ -9,7 +9,7 @@ import { ToolAvailabilityResponse } from '../models/loan.model';
   providedIn: 'root'
 })
 export class ToolService {
-  private readonly API_URL = 'http://localhost:5000/api/v1/tools';
+  private readonly API_URL = `http://${window.location.hostname}:5000/api/v1/tools`;
 
   constructor(private http: HttpClient) {}
 

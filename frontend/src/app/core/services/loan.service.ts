@@ -8,7 +8,7 @@ import { Loan } from '../models/loan.model';
   providedIn: 'root'
 })
 export class LoanService {
-  private readonly API_URL = 'http://localhost:5000/api/v1/loans';
+  private readonly API_URL = `http://${window.location.hostname}:5000/api/v1/loans`;
 
   constructor(private http: HttpClient) {}
 

@@ -16,7 +16,7 @@ export interface AdminStats {
   providedIn: 'root'
 })
 export class AdminService {
-  private readonly API_URL = 'http://localhost:5000/api/v1/admin';
+  private readonly API_URL = `http://${window.location.hostname}:5000/api/v1/admin`;
 
   constructor(private http: HttpClient) {}
 

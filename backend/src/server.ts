@@ -12,7 +12,7 @@ const startServer = async () => {
   const server = http.createServer(app);
   initSocket(server);
 
-  server.listen(ENV.PORT, () => {
+  server.listen(Number(ENV.PORT), '0.0.0.0', () => {
     console.log(`===============================================`);
     console.log(`🚀 Tool Library API - Servidor HTTP & WebSocket activo`);
     console.log(`🌐 API corriendo en: http://localhost:${ENV.PORT}`);

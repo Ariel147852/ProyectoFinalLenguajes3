@@ -8,7 +8,7 @@ import { BankDetails, PaymentReceipt, SubscriptionStatus } from '../models/payme
   providedIn: 'root'
 })
 export class PaymentService {
-  private readonly apiUrl = 'http://localhost:5000/api/v1/payments';
+  private readonly apiUrl = `http://${window.location.hostname}:5000/api/v1/payments`;
 
   constructor(private http: HttpClient) {}
 

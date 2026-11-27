@@ -10,8 +10,8 @@ import { ApiResponse } from '../models/api.model';
 })
 export class ChatService implements OnDestroy {
   private socket: Socket;
-  private readonly SOCKET_URL = 'http://localhost:5000';
-  private readonly API_URL = 'http://localhost:5000/api/v1/chat';
+  private readonly SOCKET_URL = `http://${window.location.hostname}:5000`;
+  private readonly API_URL = `http://${window.location.hostname}:5000/api/v1/chat`;
 
   private messageSubject = new Subject<ChatMessage>();
   public message$ = this.messageSubject.asObservable();

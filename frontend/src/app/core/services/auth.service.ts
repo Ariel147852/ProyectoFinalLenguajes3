@@ -8,7 +8,7 @@ import { User, AuthResponse, DatosFinancieros } from '../models/user.model';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:5000/api/v1/auth';
+  private readonly API_URL = `http://${window.location.hostname}:5000/api/v1/auth`;
 
   // Reactividad moderna con Angular Signals
   currentUser = signal<User | null>(this.getUserFromStorage());
